@@ -1,22 +1,23 @@
 # version 2.0
 # DONE: append update
-# TODO: write index_df and stock_df into database, use 'replace' method
+# DONE: write index_df and stock_df into database, use 'replace' method
 # TODO: adjust mode = post history
+# TODO: move local operation to another module to improve performance
+# TODO: set primary key for daily table
 
 import os
 from datetime import datetime, timedelta
 
+import fire
 import jaqs.util as jutil
 import pandas as pd
 from sqlalchemy import create_engine
 
-from tdata.config_path import HISTORY_PATH
+from tdata.config_path import HISTORY_DIR, HISTORY_DB, DAILY_TABLE, INDEX_TABLE, STOCK_TABLE
 from tdata.quantos import ds
 
-history_db = 'history.db'
-db_path = os.path.join(HISTORY_PATH, history_db)
+db_path = os.path.join(HISTORY_DIR, HISTORY_DB)
 engine = create_engine('sqlite:///{}'.format(db_path))
-daily_table = 'daily'
 
 
 def newest_trade_date():
@@ -45,9 +46,27 @@ symbols = indexes + stocks
 today = newest_trade_date()
 
 
+def update_index_table():
+    index_df, msg = ds.query(
+        view='jz.instrumentInfo',
+        fields='status,list_date,name,market',
+        filter='inst_type=100&status=1&symbol=',
+        data_format='pandas')
+    index_df.to_sql(INDEX_TABLE, engine, if_exists='replace')
+
+
+def update_stock_table():
+    stock_df, msg = ds.query(
+        view='jz.instrumentInfo',
+        fields='status,list_date,name,market',
+        filter='inst_type=1&status=1&symbol=',
+        data_format='pandas')
+    stock_df.to_sql(STOCK_TABLE, engine, if_exists='replace')
+
+
 def local_daily(symbol, start_date=19900101, end_date=today, fields='*'):
     props = {
-        'table': daily_table,
+        'table': DAILY_TABLE,
         'symbol': symbol,
         'start_date': start_date,
         'end_date': end_date,
@@ -62,6 +81,12 @@ def local_last_date(symbol='000001.SH'):
     local_data = local_daily(symbol)
     last_date = local_data['trade_date'].iloc[-1]
     return last_date
+
+
+def local_first_date(symbol='000001.SH'):
+    local_data = local_daily(symbol)
+    first_date = local_data['trade_date'].iloc[0]
+    return first_date
 
 
 def next_trade_date():
@@ -92,14 +117,15 @@ def update_daily_table():
         'end_date': today,
         'fields': remote_fields
     }
-    print('Downloading daily data from {} to {}.'.format(next_trade_date(), today))
+    print('Downloading daily data from {} to {}.'.format(
+        next_trade_date(), today))
     df, msg = ds.daily(**props)
     print('Writing to the Database.')
-    df.to_sql(daily_table, engine, if_exists='append', chunksize=1000)
+    df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=1000)
 
 
 def init_daily_table():
-    if not engine.dialect.has_table(engine, daily_table):
+    if not engine.dialect.has_table(engine, DAILY_TABLE):
         start_date = 19901219
     else:
         start_date = next_trade_date()
@@ -118,5 +144,10 @@ def init_daily_table():
             start_date, end_date))
         df, msg = ds.daily(**props)
         print('Writing to the Database.')
-        df.to_sql(daily_table, engine, if_exists='append', chunksize=100000)
+        df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=100000)
         start_date = next_trade_date()
+    print('Database initialization complete.')
+
+
+if __name__ == '__main__':
+    fire.Fire()
