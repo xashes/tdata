@@ -1,15 +1,17 @@
 # version 1.0
 # Local operations without network connection
 
+# TODO: add param to db_last_date to indicate minute or daily table
+
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import fire
 import pandas as pd
 from sqlalchemy import create_engine
 import jaqs.util as jutil
 
-from tdata.config_path import HISTORY_DIR, HISTORY_DB, DAILY_TABLE, INDEX_TABLE, STOCK_TABLE
+from tdata.consts import HISTORY_DIR, HISTORY_DB, DAILY_TABLE, MINUTE_TABLE, INDEX_TABLE, STOCK_TABLE, SH_INDEX
 
 db_path = os.path.join(HISTORY_DIR, HISTORY_DB)
 engine = create_engine('sqlite:///{}'.format(db_path))
@@ -33,16 +35,15 @@ def query_stock_symbols() -> pd.Series:
     return query_stock_table().loc[:, 'symbol']
 
 
-def db_last_date(symbol='000001.SH'):
+def db_last_date(symbol=SH_INDEX) -> int:
     local_data = daily(symbol)
     last_date = local_data['trade_date'].iloc[-1]
     return last_date
 
 
-def db_first_date(symbol='000001.SH'):
+def db_first_date(symbol=SH_INDEX) -> int:
     local_data = daily(symbol)
-    first_date = local_data['trade_date'].iloc[0]
-    return first_date
+    return local_data['trade_date'].iloc[0]
 
 
 def daily(symbol: str,
@@ -58,6 +59,23 @@ def daily(symbol: str,
     }
     return pd.read_sql_query(
         "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date};".
+        format(**props), engine)
+
+
+def bar(symbol: str,
+        trade_date: int,
+        start_time=90000,
+        end_time=160000,
+        fields='*') -> pd.DataFrame:
+    props = dict(
+        table=MINUTE_TABLE,
+        symbol=symbol,
+        trade_date=trade_date,
+        start_time=start_time,
+        end_time=end_time,
+        fields=fields)
+    return pd.read_sql_query(
+        "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date = {trade_date} AND time >= {start_time} AND time <= {end_time};".
         format(**props), engine)
 
 
