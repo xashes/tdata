@@ -62,20 +62,16 @@ def daily(symbol: str,
         format(**props), engine)
 
 
-def bar(symbol: str,
-        trade_date: int,
-        start_time=90000,
-        end_time=160000,
+def bar(symbol: str, start_date: int, end_date: int,
         fields='*') -> pd.DataFrame:
     props = dict(
         table=MINUTE_TABLE,
         symbol=symbol,
-        trade_date=trade_date,
-        start_time=start_time,
-        end_time=end_time,
+        start_date=start_date,
+        end_date=end_date,
         fields=fields)
     return pd.read_sql_query(
-        "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date = {trade_date} AND time >= {start_time} AND time <= {end_time};".
+        "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date};".
         format(**props), engine)
 
 
