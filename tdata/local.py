@@ -35,6 +35,12 @@ def query_stock_symbols() -> pd.Series:
     return query_stock_table().loc[:, 'symbol']
 
 
+def query_all_symbols() -> str:
+    indexes = ','.join(query_index_symbols())
+    stocks = ','.join(query_stock_symbols())
+    return indexes + stocks
+
+
 def db_last_date(symbol=SH_INDEX) -> int:
     local_data = daily(symbol)
     last_date = local_data['trade_date'].iloc[-1]
@@ -65,7 +71,7 @@ def daily(symbol: str,
 def bar(symbol: str = SH_INDEX,
         start_date: int = jutil.shift(today, n_weeks=-4),
         end_date: int = today,
-        fields='*') -> pd.DataFrame:
+        fields: str = '*') -> pd.DataFrame:
     props = dict(
         table=MINUTE_TABLE,
         symbol=symbol,
