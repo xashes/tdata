@@ -6,7 +6,6 @@
 # TODO: figure out how to calculate adjust price
 
 import os
-import typing as tp
 from datetime import datetime
 
 import fire
@@ -20,10 +19,6 @@ from tdata.quantos import ds
 
 db_path = os.path.join(HISTORY_DIR, HISTORY_DB)
 engine = create_engine('sqlite:///{}'.format(db_path))
-
-indexes = ','.join(local.query_index_symbols())
-stocks = ','.join(local.query_stock_symbols())
-symbols = indexes + stocks
 
 
 def newest_trade_date():
@@ -60,6 +55,10 @@ def db_next_date():
     return ds.query_next_trade_date(local.db_last_date())
 
 
+def next_bar_date():
+    return ds.query_next_trade_date(local.last_bar_date())
+
+
 def remote_sample_bar():
     props = dict(symbol=SH_INDEX, trade_date=today, fields=remote_fields)
     bar, msg = ds.bar(**props)
@@ -89,7 +88,7 @@ def test_new_data():
 
 def update_daily_table():
     props = {
-        'symbol': symbols,
+        'symbol': local.query_all_symbols(),
         'start_date': db_next_date(),
         'end_date': today,
         'fields': remote_fields
@@ -110,7 +109,7 @@ def init_daily_table():
     while start_date <= 20180101:  # TODO: while not sync as remote data
         end_date = jutil.shift(start_date, n_weeks=56)
         props = {
-            'symbol': symbols,
+            'symbol': local.query_all_symbols(),
             'start_date': start_date,
             'end_date': end_date,
             'fields': remote_fields
@@ -123,28 +122,30 @@ def init_daily_table():
         start_date = db_next_date()
     print('Database initialization complete.')
 
+
 # TODO: complete this function
 def update_minute_table() -> None:
     if not remote_uptodate():
         print('The remote data is not up-to-date.')
         return
-    # if not engine.dialect.has_table(engine, MINUTE_TABLE):
-    #     start_date = jutil.shift(today, n_weeks=-4)
-    # else:
-    #     # TODO: to get the minute database next date
-    #     # TODO: write some test functions to ensure the correction of minute data
-    #     start_date = db_next_date()
-    try:
-        start_date = db_next_date(MINUTE_TABLE)
-    except:
+    if local.last_bar_date() == today:
+        print('The Minute Table is already up-to-date.')
+        return
+    if not engine.dialect.has_table(engine, MINUTE_TABLE):
         # start_date = 20120104
-        start_date = 20180201
-    end_date = jutil.shift(start_date, n_weeks=1)
+        start_date = jutil.shift(today, n_weeks=-10)
+    else:
+        start_date = next_bar_date()
+
+    end_date = today
 
     trade_dates = ds.query_trade_dates(start_date, end_date)
     for date in trade_dates:
         props = dict(
-            symbol=symbols, trade_date=date, freq='1M', fields=remote_fields)
+            symbol=local.query_all_symbols(),
+            trade_date=date,
+            freq='1M',
+            fields=remote_fields)
         print('Downloading minute data of {}.'.format(date))
         bar, msg = ds.bar(**props)
         print('Writing to the Database.')
@@ -155,6 +156,7 @@ def update_database():
     update_index_table()
     update_stock_table()
     update_daily_table()
+    update_minute_table()
 
 
 if __name__ == '__main__':
