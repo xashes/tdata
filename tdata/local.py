@@ -62,7 +62,9 @@ def daily(symbol: str,
         format(**props), engine)
 
 
-def bar(symbol: str, start_date: int, end_date: int,
+def bar(symbol: str = SH_INDEX,
+        start_date: int = jutil.shift(today, n_weeks=-4),
+        end_date: int = today,
         fields='*') -> pd.DataFrame:
     props = dict(
         table=MINUTE_TABLE,
@@ -73,6 +75,14 @@ def bar(symbol: str, start_date: int, end_date: int,
     return pd.read_sql_query(
         "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date} ORDER BY trade_date, time;".
         format(**props), engine)
+
+
+def last_bar_date() -> int:
+    return bar()['trade_date'].iloc[-1]
+
+
+def first_bar_date() -> int:
+    return bar(start_date=20120101)['trade_date'].iloc[0]
 
 
 if __name__ == '__main__':
