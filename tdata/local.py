@@ -58,7 +58,7 @@ def daily(symbol: str,
         'fields': fields
     }
     return pd.read_sql_query(
-        "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date};".
+        "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date} ORDER BY trade_date;".
         format(**props), engine)
 
 
@@ -71,7 +71,7 @@ def bar(symbol: str, start_date: int, end_date: int,
         end_date=end_date,
         fields=fields)
     return pd.read_sql_query(
-        "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date};".
+        "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date} ORDER BY trade_date, time;".
         format(**props), engine)
 
 
