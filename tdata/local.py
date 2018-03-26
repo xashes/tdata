@@ -14,6 +14,7 @@ import fire
 import pandas as pd
 from sqlalchemy import create_engine
 import jaqs.util as jutil
+import tdata.util as tutil
 
 from tdata.consts import HISTORY_DIR, HISTORY_DB, DAILY_TABLE, MINUTE_TABLE, INDEX_TABLE, STOCK_TABLE, SH_INDEX
 
@@ -83,17 +84,7 @@ def weekly(symbol: str = SH_INDEX,
            end_date: int = today,
            fields: str = '*') -> pd.DataFrame:
     day_bar = daily(symbol, start_date, end_date, fields)
-    resampled = day_bar.resample('W', on='trade_date')
-    weekly = pd.DataFrame({
-        'close': resampled['close'].last(),
-        'high': resampled['high'].max(),
-        'low': resampled['low'].min(),
-        'open': resampled['open'].first(),
-        'symbol': symbol,
-        'turnover': resampled['turnover'].sum(),
-        'volume': resampled['volume'].sum()
-    })
-    return weekly
+    return tutil.resample_bar('W', on='trade_date', symbol=symbol, bar=day_bar)
 
 
 def bar(symbol: str = SH_INDEX,
