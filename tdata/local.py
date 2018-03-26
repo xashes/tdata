@@ -76,7 +76,7 @@ def daily(symbol: str = SH_INDEX,
             'trade_date': {
                 'format': '%Y%m%d'
             }
-        })
+        }).set_index('trade_date').drop(columns=['index'])
 
 
 def weekly(symbol: str = SH_INDEX,
@@ -84,12 +84,21 @@ def weekly(symbol: str = SH_INDEX,
            end_date: int = today,
            fields: str = '*') -> pd.DataFrame:
     day_bar = daily(symbol, start_date, end_date, fields)
-    return tutil.resample_bar('W', on='trade_date', symbol=symbol, bar=day_bar)
+    return tutil.resample_bar('W', bar=day_bar)
+
+
+def monthly(symbol: str = SH_INDEX,
+            start_date: int = 19901219,
+            end_date: int = today,
+            fields: str = '*') -> pd.DataFrame:
+    day_bar = daily(symbol, start_date, end_date, fields)
+    return tutil.resample_bar('M', bar=day_bar)
 
 
 def bar(symbol: str = SH_INDEX,
         start_date: int = jutil.shift(today, n_weeks=-4),
         end_date: int = today,
+        freq: int = 1,
         fields: str = '*') -> pd.DataFrame:
     props = dict(
         table=MINUTE_TABLE,
@@ -97,9 +106,13 @@ def bar(symbol: str = SH_INDEX,
         start_date=start_date,
         end_date=end_date,
         fields=fields)
-    return pd.read_sql_query(
+    bar = pd.read_sql_query(
         "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date} ORDER BY trade_date, time;".
         format(**props), engine)
+    bar = tutil.combine_date_time_column(bar).set_index('datetime').drop(
+        columns=['index'])
+    freq = str(freq) + 'T'
+    return tutil.resample_bar(freq, bar)
 
 
 def bar_last_date() -> int:
