@@ -47,14 +47,13 @@ def query_all_symbols() -> str:
 
 
 def daily_last_date(symbol=SH_INDEX) -> int:
-    local_data = daily(symbol)
-    last_date = local_data['trade_date'].iloc[-1]
-    return last_date
+    last_date = daily(symbol).index[-1]
+    return jutil.convert_datetime_to_int(last_date)
 
 
 def daily_first_date(symbol=SH_INDEX) -> int:
-    local_data = daily(symbol)
-    return local_data['trade_date'].iloc[0]
+    first_date = daily(symbol, start_date=19901219).index[0]
+    return jutil.convert_datetime_to_int(first_date)
 
 
 def daily(symbol: str = SH_INDEX,
@@ -116,11 +115,13 @@ def bar(symbol: str = SH_INDEX,
 
 
 def bar_last_date() -> int:
-    return bar()['trade_date'].iloc[-1]
+    last_date = bar().index[-1]
+    return jutil.convert_datetime_to_int(last_date)
 
 
 def bar_first_date() -> int:
-    return bar(start_date=20120101)['trade_date'].iloc[0]
+    first_date = bar(start_date=20120101).index[0]
+    return jutil.convert_datetime_to_int(first_date)
 
 
 if __name__ == '__main__':

@@ -34,20 +34,24 @@ remote_fields = 'symbol,freq,close,high,low,open,trade_date,trade_status,turnove
 
 
 def update_index_table():
+    print('Downloading index table.')
     index_df, msg = ds.query(
         view='jz.instrumentInfo',
         fields='status,list_date,name,market',
         filter='inst_type=100&status=1&symbol=',
         data_format='pandas')
+    print('Writing to the database.')
     index_df.to_sql(INDEX_TABLE, engine, if_exists='replace')
 
 
 def update_stock_table():
+    print('Downloading stock table.')
     stock_df, msg = ds.query(
         view='jz.instrumentInfo',
         fields='status,list_date,name,market',
         filter='inst_type=1&status=1&symbol=',
         data_format='pandas')
+    print('Writing to the database.')
     stock_df.to_sql(STOCK_TABLE, engine, if_exists='replace')
 
 
@@ -96,8 +100,8 @@ def update_daily_table():
     print('Downloading daily data from {} to {}.'.format(
         db_next_date(), today))
     df, msg = ds.daily(**props)
-    print('Writing to the Database.')
-    df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=1000)
+    print('Writing to the database.')
+    df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=10000)
 
 
 def init_daily_table():
@@ -117,7 +121,7 @@ def init_daily_table():
         print('Downloading daily data from {} to {}.'.format(
             start_date, end_date))
         df, msg = ds.daily(**props)
-        print('Writing to the Database.')
+        print('Writing to the database.')
         df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=100000)
         start_date = db_next_date()
     print('Database initialization complete.')
@@ -148,7 +152,7 @@ def update_minute_table() -> None:
             fields=remote_fields)
         print('Downloading minute data of {}.'.format(date))
         bar, msg = ds.bar(**props)
-        print('Writing to the Database.')
+        print('Writing to the database.')
         bar.to_sql(MINUTE_TABLE, engine, if_exists='append', chunksize=100000)
 
 
