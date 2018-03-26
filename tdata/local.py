@@ -1,7 +1,11 @@
 # version 1.0
 # Local operations without network connection
 
-# TODO: add param to db_last_date to indicate minute or daily table
+# TODO: query concept comp
+# TODO: add columns to database - pct_change, MACD...
+# TODO: concept pct_change
+# TODO: pct_change current and pct_change period
+# TODO: week bar
 
 import os
 from datetime import datetime
@@ -41,13 +45,13 @@ def query_all_symbols() -> str:
     return indexes + stocks
 
 
-def db_last_date(symbol=SH_INDEX) -> int:
+def daily_last_date(symbol=SH_INDEX) -> int:
     local_data = daily(symbol)
     last_date = local_data['trade_date'].iloc[-1]
     return last_date
 
 
-def db_first_date(symbol=SH_INDEX) -> int:
+def daily_first_date(symbol=SH_INDEX) -> int:
     local_data = daily(symbol)
     return local_data['trade_date'].iloc[0]
 
@@ -83,11 +87,11 @@ def bar(symbol: str = SH_INDEX,
         format(**props), engine)
 
 
-def last_bar_date() -> int:
+def bar_last_date() -> int:
     return bar()['trade_date'].iloc[-1]
 
 
-def first_bar_date() -> int:
+def bar_first_date() -> int:
     return bar(start_date=20120101)['trade_date'].iloc[0]
 
 

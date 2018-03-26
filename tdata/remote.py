@@ -52,11 +52,11 @@ def update_stock_table():
 
 
 def db_next_date():
-    return ds.query_next_trade_date(local.db_last_date())
+    return ds.query_next_trade_date(local.daily_last_date())
 
 
 def next_bar_date():
-    return ds.query_next_trade_date(local.last_bar_date())
+    return ds.query_next_trade_date(local.bar_last_date())
 
 
 def remote_sample_bar():
@@ -76,7 +76,7 @@ def test_new_data():
     symbol = SH_INDEX
     props = {
         'symbol': symbol,
-        'start_date': local.db_last_date(),
+        'start_date': local.daily(),
         'end_date': today,
         'fields': 'symbol,trade_date'
     }
@@ -128,7 +128,7 @@ def update_minute_table() -> None:
     if not remote_uptodate():
         print('The remote data is not up-to-date.')
         return
-    if local.last_bar_date() == today:
+    if local.bar_() == today:
         print('The Minute Table is already up-to-date.')
         return
     if not engine.dialect.has_table(engine, MINUTE_TABLE):
