@@ -56,7 +56,7 @@ def daily_first_date(symbol=SH_INDEX) -> int:
     return local_data['trade_date'].iloc[0]
 
 
-def daily(symbol: str,
+def daily(symbol: str = SH_INDEX,
           start_date=jutil.shift(today, n_weeks=-156),
           end_date=today,
           fields='*') -> pd.DataFrame:
@@ -69,7 +69,31 @@ def daily(symbol: str,
     }
     return pd.read_sql_query(
         "SELECT {fields} FROM {table} WHERE symbol = '{symbol}' AND trade_date >= {start_date} AND trade_date <= {end_date} ORDER BY trade_date;".
-        format(**props), engine)
+        format(**props),
+        engine,
+        parse_dates={
+            'trade_date': {
+                'format': '%Y%m%d'
+            }
+        })
+
+
+def weekly(symbol: str = SH_INDEX,
+           start_date: int = jutil.shift(today, n_weeks=-626),
+           end_date: int = today,
+           fields: str = '*') -> pd.DataFrame:
+    day_bar = daily(symbol, start_date, end_date, fields)
+    resampled = day_bar.resample('W', on='trade_date')
+    weekly = pd.DataFrame({
+        'close': resampled['close'].last(),
+        'high': resampled['high'].max(),
+        'low': resampled['low'].min(),
+        'open': resampled['open'].first(),
+        'symbol': symbol,
+        'turnover': resampled['turnover'].sum(),
+        'volume': resampled['volume'].sum()
+    })
+    return weekly
 
 
 def bar(symbol: str = SH_INDEX,

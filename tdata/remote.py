@@ -149,7 +149,7 @@ def update_minute_table() -> None:
         print('Downloading minute data of {}.'.format(date))
         bar, msg = ds.bar(**props)
         print('Writing to the Database.')
-        bar.to_sql(MINUTE_TABLE, engine, if_exists='append', chunksize=10000)
+        bar.to_sql(MINUTE_TABLE, engine, if_exists='append', chunksize=100000)
 
 
 def update_database():
