@@ -1,8 +1,5 @@
 # version 2.0
-# DONE: append update
-# DONE: write index_df and stock_df into database, use 'replace' method
-# DONE: set primary key for daily table
-# TODO: adjust mode = post history or get dividen parameter
+# TODO: adjust mode = post history or get dividen parameter - consider using dataview
 # TODO: figure out how to calculate adjust price
 
 import os
@@ -15,7 +12,7 @@ from sqlalchemy import create_engine
 import tdata.local as local
 from tdata.consts import (DAILY_TABLE, HISTORY_DB, HISTORY_DIR, INDEX_TABLE,
                           MINUTE_TABLE, SH_INDEX, STOCK_TABLE)
-from tdata.quantos import ds
+from tdata.remote_service import ds
 
 db_path = os.path.join(HISTORY_DIR, HISTORY_DB)
 engine = create_engine('sqlite:///{}'.format(db_path))
@@ -55,11 +52,11 @@ def update_stock_table():
     stock_df.to_sql(STOCK_TABLE, engine, if_exists='replace')
 
 
-def db_next_date():
+def daily_next_date():
     return ds.query_next_trade_date(local.daily_last_date())
 
 
-def next_bar_date():
+def bar_next_date():
     return ds.query_next_trade_date(local.bar_last_date())
 
 
@@ -77,71 +74,49 @@ def remote_uptodate() -> bool:
 
 
 def test_new_data():
-    symbol = SH_INDEX
     props = {
-        'symbol': symbol,
-        'start_date': local.daily(),
-        'end_date': today,
-        'fields': 'symbol,trade_date'
+        'symbol': SH_INDEX,
+        'trade_date': today,
+        'fields': 'symbol,trade_date,close'
     }
-    local_data = local.daily(**props)
-    remote_data = ds.daily(**props)
-    print('\nLocal Data:\n{}'.format(local_data))
-    print('\nRemote Data:\n{}'.format(remote_data))
+    remote_bar, msg = ds.bar(**props)
+    print('\nLocal Bar:\n{}'.format(
+        local.bar(start_date=local.bar_last_date()).tail()))
+    print('\nRemote Bar:\n{}'.format(remote_bar.tail()))
 
 
-def update_daily_table():
-    props = {
-        'symbol': local.query_all_symbols(),
-        'start_date': db_next_date(),
-        'end_date': today,
-        'fields': remote_fields
-    }
-    print('Downloading daily data from {} to {}.'.format(
-        db_next_date(), today))
-    df, msg = ds.daily(**props)
-    print('Writing to the database.')
-    df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=10000)
-
-
-def init_daily_table():
+def update_daily_table(end_date: int = today):
+    if local.daily_last_date() == today:
+        print('The Daily Table is already up-to-date.')
+        return
     if not engine.dialect.has_table(engine, DAILY_TABLE):
         start_date = 19901219
     else:
-        start_date = db_next_date()
+        start_date = daily_next_date()
 
-    while start_date <= 20180101:  # TODO: while not sync as remote data
-        end_date = jutil.shift(start_date, n_weeks=56)
-        props = {
-            'symbol': local.query_all_symbols(),
-            'start_date': start_date,
-            'end_date': end_date,
-            'fields': remote_fields
-        }
-        print('Downloading daily data from {} to {}.'.format(
-            start_date, end_date))
-        df, msg = ds.daily(**props)
-        print('Writing to the database.')
-        df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=100000)
-        start_date = db_next_date()
-    print('Database initialization complete.')
+    props = {
+        'symbol': local.query_all_symbols(),
+        'start_date': start_date,
+        'end_date': end_date,
+        'fields': remote_fields
+    }
+    print('Downloading daily data from {} to {}.'.format(start_date, end_date))
+    df, msg = ds.daily(**props)
+    print('Writing to the database.')
+    df.to_sql(DAILY_TABLE, engine, if_exists='append', chunksize=100000)
+    print('Daily table updating complete.')
 
 
 # TODO: complete this function
-def update_minute_table() -> None:
-    if not remote_uptodate():
-        print('The remote data is not up-to-date.')
-        return
-    if local.bar_() == today:
+def update_minute_table(end_date: int = today) -> None:
+    if local.bar_last_date() == today:
         print('The Minute Table is already up-to-date.')
         return
     if not engine.dialect.has_table(engine, MINUTE_TABLE):
         # start_date = 20120104
         start_date = jutil.shift(today, n_weeks=-10)
     else:
-        start_date = next_bar_date()
-
-    end_date = today
+        start_date = bar_next_date()
 
     trade_dates = ds.query_trade_dates(start_date, end_date)
     for date in trade_dates:
@@ -154,9 +129,13 @@ def update_minute_table() -> None:
         bar, msg = ds.bar(**props)
         print('Writing to the database.')
         bar.to_sql(MINUTE_TABLE, engine, if_exists='append', chunksize=100000)
+        print('Minute table updating complete.')
 
 
 def update_database():
+    if not remote_uptodate():
+        print('The remote data is not up-to-date.')
+        return
     update_index_table()
     update_stock_table()
     update_daily_table()

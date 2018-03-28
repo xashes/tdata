@@ -5,7 +5,6 @@
 # TODO: add columns to database - pct_change, MACD...
 # TODO: concept pct_change
 # TODO: pct_change current and pct_change period
-# TODO: week bar
 
 import os
 from datetime import datetime
@@ -44,6 +43,14 @@ def query_all_symbols() -> str:
     indexes = ','.join(query_index_symbols())
     stocks = ','.join(query_stock_symbols())
     return indexes + stocks
+
+
+def query_all_symbol_names() -> pd.Series:
+    indexes = query_index_table()
+    indexes = indexes.symbol + ' ' + indexes.name
+    stocks = query_stock_table()
+    stocks = stocks.symbol + ' ' + stocks.name
+    return indexes.append(stocks, ignore_index=True)
 
 
 def daily_last_date(symbol=SH_INDEX) -> int:

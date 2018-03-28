@@ -4,11 +4,11 @@ import os
 
 # Path
 DATA_CONFIG_PATH = os.path.expanduser(
-    '~/ownCloud/jaqsData/config/data_config.json')
+    '~/ownCloud/config/jaqs/data_config.json')
 TRADE_CONFIG_PATH = os.path.expanduser(
-    '~/ownCloud/jaqsData/config/trade_config.json')
+    '~/ownCloud/config/jaqs/trade_config.json')
 
-HISTORY_DIR = os.path.expanduser('~/jaqsData/history')
+HISTORY_DIR = os.path.expanduser('~/tData/history')
 HISTORY_DB = 'history.db'
 DAILY_TABLE = 'daily'
 MINUTE_TABLE = 'minute'
