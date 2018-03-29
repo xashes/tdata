@@ -8,6 +8,7 @@ name = "pypi"
 [packages]
 
 jaqs = "*"
+"e1839a8" = {path = ".", editable = true}
 
 
 [dev-packages]
