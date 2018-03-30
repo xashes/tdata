@@ -1,15 +1,13 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 jaqs = "*"
 "e1839a8" = {path = ".", editable = true}
-
+fire = "*"
+pytest = "*"
+sqlalchemy = "*"
 
 [dev-packages]
-
