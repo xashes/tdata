@@ -133,9 +133,6 @@ def update_minute_table(end_date: int = today) -> None:
 
 
 def update_database():
-    if not remote_uptodate():
-        print('The remote data is not up-to-date.')
-        return
     update_index_table()
     update_stock_table()
     update_daily_table()
