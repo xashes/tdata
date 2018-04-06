@@ -9,5 +9,7 @@ jaqs = "*"
 fire = "*"
 pytest = "*"
 sqlalchemy = "*"
+"py2neo" = "*"
 
 [dev-packages]
+pylint = "*"
