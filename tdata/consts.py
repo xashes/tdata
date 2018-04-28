@@ -4,9 +4,9 @@ import os
 
 # Path
 DATA_CONFIG_PATH = os.path.expanduser(
-    '~/ownCloud/config/jaqs/data_config.json')
+    '~/Nextcloud/config/jaqs/data_config.json')
 TRADE_CONFIG_PATH = os.path.expanduser(
-    '~/ownCloud/config/jaqs/trade_config.json')
+    '~/Nextcloud/config/jaqs/trade_config.json')
 
 HISTORY_DIR = os.path.expanduser('~/tradeData/history')
 HISTORY_DB = 'history.db'
