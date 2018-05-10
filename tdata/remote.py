@@ -5,7 +5,6 @@
 import os
 from datetime import datetime
 
-import fire
 import jaqs.util as jutil
 from sqlalchemy import create_engine
 
@@ -140,4 +139,5 @@ def update_database():
 
 
 if __name__ == '__main__':
+    import fire
     fire.Fire()

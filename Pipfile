@@ -13,3 +13,4 @@ sqlalchemy = "*"
 
 [dev-packages]
 pylint = "*"
+twine = "*"
