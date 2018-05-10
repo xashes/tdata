@@ -9,7 +9,6 @@
 import os
 from datetime import datetime
 
-import fire
 import pandas as pd
 from sqlalchemy import create_engine
 import jaqs.util as jutil
@@ -132,4 +131,5 @@ def bar_first_date() -> int:
 
 
 if __name__ == '__main__':
+    import fire
     fire.Fire()
