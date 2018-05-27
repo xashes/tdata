@@ -10,6 +10,7 @@ fire = "*"
 pytest = "*"
 sqlalchemy = "*"
 "py2neo" = "*"
+pymongo = "*"
 
 [dev-packages]
 pylint = "*"

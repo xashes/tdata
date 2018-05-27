@@ -29,26 +29,24 @@ today = newest_trade_date()
 remote_fields = 'symbol,freq,close,high,low,open,trade_date,trade_status,turnover,volume'
 
 
-def update_index_table():
+def download_index_table():
     print('Downloading index table.')
-    index_df, msg = ds.query(
+    index_df, _ = ds.query(
         view='jz.instrumentInfo',
-        fields='status,list_date,name,market',
+        fields='list_date,name,market',
         filter='inst_type=100&status=1&symbol=',
         data_format='pandas')
-    print('Writing to the database.')
-    index_df.to_sql(INDEX_TABLE, engine, if_exists='replace')
+    return index_df[index_df['market'].str.contains(r'SH|SZ')]
 
 
-def update_stock_table():
+def download_stock_table():
     print('Downloading stock table.')
-    stock_df, msg = ds.query(
+    stock_df, _ = ds.query(
         view='jz.instrumentInfo',
-        fields='status,list_date,name,market',
+        fields='list_date,name,market',
         filter='inst_type=1&status=1&symbol=',
         data_format='pandas')
-    print('Writing to the database.')
-    stock_df.to_sql(STOCK_TABLE, engine, if_exists='replace')
+    return stock_df[stock_df['symbol'].str.contains(r'SH|SZ')]
 
 
 def daily_next_date():
