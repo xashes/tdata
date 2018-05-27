@@ -33,7 +33,7 @@ def download_index_table():
     print('Downloading index table.')
     index_df, _ = ds.query(
         view='jz.instrumentInfo',
-        fields='list_date,name,market',
+        fields='list_date,name,market,inst_type',
         filter='inst_type=100&status=1&symbol=',
         data_format='pandas')
     return index_df[index_df['market'].str.contains(r'SH|SZ')]
@@ -43,7 +43,7 @@ def download_stock_table():
     print('Downloading stock table.')
     stock_df, _ = ds.query(
         view='jz.instrumentInfo',
-        fields='list_date,name,market',
+        fields='list_date,name,market,inst_type',
         filter='inst_type=1&status=1&symbol=',
         data_format='pandas')
     return stock_df[stock_df['symbol'].str.contains(r'SH|SZ')]
