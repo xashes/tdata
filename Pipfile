@@ -11,6 +11,7 @@ pytest = "*"
 sqlalchemy = "*"
 "py2neo" = "*"
 pymongo = "*"
+tqdm = "*"
 
 [dev-packages]
 pylint = "*"
