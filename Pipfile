@@ -12,7 +12,9 @@ sqlalchemy = "*"
 "py2neo" = "*"
 pymongo = "*"
 tqdm = "*"
+arctic = {git = "https://github.com/manahl/arctic.git"}
 
 [dev-packages]
 pylint = "*"
 twine = "*"
+"flake8" = "*"
