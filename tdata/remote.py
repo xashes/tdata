@@ -39,12 +39,6 @@ def download_index_table():
     return index_df[index_df['market'].str.contains(r'SH|SZ')]
 
 
-def update_index_table():
-    print('Writing to database')
-    df = download_index_table()
-    df.to_sql(INDEX_TABLE, engine, if_exists='replace', chunksize=100000)
-
-
 def download_stock_table():
     print('Downloading stock table.')
     stock_df, _ = ds.query(
@@ -53,12 +47,6 @@ def download_stock_table():
         filter='inst_type=1&status=1&symbol=',
         data_format='pandas')
     return stock_df[stock_df['symbol'].str.contains(r'SH|SZ')]
-
-
-def update_stock_table():
-    print('Writing to database')
-    df = download_stock_table()
-    df.to_sql(STOCK_TABLE, engine, if_exists='replace', chunksize=100000)
 
 
 def daily_next_date():
