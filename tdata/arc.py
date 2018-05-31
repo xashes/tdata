@@ -3,9 +3,10 @@ import pandas as pd
 from tqdm import tqdm
 
 import local
-# import remote
+import remote
+from remote_service import ds
 
-arctic = Arctic('localhost')
+arctic = Arctic('192.168.199.217')
 basedata = arctic['basedata']
 
 def init_libraries():
@@ -20,6 +21,21 @@ def update_instruments_document():
     instruments = pd.concat([stocks, idx], ignore_index=True)
 
     basedata.write('instruments', instruments, metadata={'source': 'jaqs'})
+
+def init_daily_lib():
+    symbols = basedata.read('instruments').data['symbol']
+    symbols = tqdm(symbols)
+    daily_lib = arctic['daily']
+
+    for symbol in symbols:
+        try:
+            df, _ = ds.daily(symbol, 19900101, 20180601, adjust_mode='post')
+            df = df.set_index('trade_date')
+            last_date = df.index[-1]
+            daily_lib.write(symbol, df, metadata={'source': 'jaqs', 'last_date': int(last_date)})
+        except Exception as e:
+            print(f'Failed for {symbol}: {str(e)}')
+
 
 def convert_daily_collection():
     daily = arctic['daily']
@@ -49,5 +65,7 @@ def convert_minute_collection():
 
 if __name__ == '__main__':
     # init_libraries()
+    init_daily_lib()
     # update_instruments_document()
-    convert_minute_collection()
+    # convert_daily_collection()
+    # convert_minute_collection()
