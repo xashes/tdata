@@ -2,19 +2,20 @@
 # TODO: adjust mode = post history or get dividen parameter - consider using dataview
 # TODO: figure out how to calculate adjust price
 
-import os
 from datetime import datetime
 
 import jaqs.util as jutil
-from sqlalchemy import create_engine
+from arctic import Arctic
+from tqdm import tqdm
+import pandas as pd
 
-import tdata.local as local
-from tdata.consts import (DAILY_TABLE, HISTORY_DB, HISTORY_DIR, INDEX_TABLE,
-                          MINUTE_TABLE, SH_INDEX, STOCK_TABLE)
 from tdata.remote_service import ds
+from tdata import local
 
-db_path = os.path.join(HISTORY_DIR, HISTORY_DB)
-engine = create_engine('sqlite:///{}'.format(db_path))
+arctic = Arctic('pi3')
+BASEDATA_LIB = arctic['basedata']
+DAILY_LIB = arctic['daily']
+MINUTE_LIb = arctic['minute']
 
 
 def newest_trade_date():
@@ -26,8 +27,6 @@ def newest_trade_date():
 
 
 today = newest_trade_date()
-remote_fields = 'symbol,freq,close,high,low,open,trade_date,trade_status,turnover,volume'
-
 
 def download_index_table():
     print('Downloading index table.')
@@ -49,16 +48,22 @@ def download_stock_table():
     return stock_df[stock_df['symbol'].str.contains(r'SH|SZ')]
 
 
-def daily_next_date():
-    return ds.query_next_trade_date(local.daily_last_date())
+def update_instruments_document():
+    stocks = download_stock_table()
+    idx = download_index_table()
+    instruments = pd.concat([stocks, idx], ignore_index=True)
 
-
-def bar_next_date():
-    return ds.query_next_trade_date(local.bar_last_date())
+    BASEDATA_LIB.write(
+        'instruments',
+        instruments,
+        metadata={
+            'source': 'jaqs',
+            'updated': datetime.today()
+        })
 
 
 def remote_sample_bar():
-    props = dict(symbol=SH_INDEX, trade_date=today, fields=remote_fields)
+    props = dict(symbol='000001.SH', trade_date=today)
     bar, msg = ds.bar(**props)
     return bar.tail()
 
@@ -68,18 +73,6 @@ def remote_uptodate() -> bool:
     if len(bar):
         return True
     return False
-
-
-def test_new_data():
-    props = {
-        'symbol': SH_INDEX,
-        'trade_date': today,
-        'fields': 'symbol,trade_date,close'
-    }
-    remote_bar, msg = ds.bar(**props)
-    print('\nLocal Bar:\n{}'.format(
-        local.bar(start_date=local.bar_last_date()).tail()))
-    print('\nRemote Bar:\n{}'.format(remote_bar.tail()))
 
 
 def update_daily_table(end_date: int = today):
@@ -106,14 +99,9 @@ def update_daily_table(end_date: int = today):
 
 # TODO: complete this function
 def update_minute_table(end_date: int = today) -> None:
-    if local.bar_last_date() == today:
+    if local.minute_last_date() == today:
         print('The Minute Table is already up-to-date.')
         return
-    if not engine.dialect.has_table(engine, MINUTE_TABLE):
-        # start_date = 20120104
-        start_date = jutil.shift(today, n_weeks=-10)
-    else:
-        start_date = bar_next_date()
 
     trade_dates = ds.query_trade_dates(start_date, end_date)
     for date in trade_dates:
@@ -130,8 +118,7 @@ def update_minute_table(end_date: int = today) -> None:
 
 
 def update_database():
-    update_index_table()
-    update_stock_table()
+    update_instruments_document()
     update_daily_table()
     update_minute_table()
 
