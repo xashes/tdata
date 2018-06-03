@@ -35,7 +35,10 @@ def daily(symbol: str = '000001.SH',
           end_date: int = today) -> pd.DataFrame:
     day_bar = DAILY_LIB.read(symbol).data.loc[start_date:end_date]
     day_bar.index = jutil.convert_int_to_datetime(day_bar.index)
-    return day_bar
+    return day_bar.loc[:, [
+        'close', 'high', 'low', 'open', 'symbol', 'trade_status', 'turnover',
+        'volume'
+    ]]
 
 
 def weekly(symbol: str = '000001.SH',
@@ -52,21 +55,16 @@ def monthly(symbol: str = '000001.SH',
     return tutil.resample_bar('M', bar=day_bar)
 
 
+# TODO: fix problem with more than 120T
+# TODO: test with other source
 def minute(symbol: str = '000001.SH',
            start_date: int = jutil.shift(today, n_weeks=-4),
            end_date: int = today,
            freq: int = 1) -> pd.DataFrame:
-    return MINUTE_LIB.read(symbol).data.loc[jutil.convert_int_to_datetime(
-        start_date).date():jutil.convert_int_to_datetime(end_date).date()]
-    # bar = tutil.combine_date_time_column(bar).set_index('datetime').drop(
-    #     columns=['index'])
-    # freq = str(freq) + 'T'
-    # return tutil.resample_bar(freq, bar)
-
-
-def minute_last_date(symbol: str = '000001.SH') -> int:
-    last_date = MINUTE_LIB.read(symbol).metadata['lastdate']
-    return jutil.convert_datetime_to_int(last_date)
+    bar = MINUTE_LIB.read(symbol).data.loc[start_date:end_date]
+    bar = tutil.combine_date_time_column(bar).set_index('datetime')
+    freq = str(freq) + 'T'
+    return tutil.resample_bar(freq, bar)
 
 
 if __name__ == '__main__':
