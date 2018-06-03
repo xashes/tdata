@@ -118,9 +118,10 @@ def update_minute_lib():
                 minute_lib.read(symbol).metadata.get('last_date'))
         except NoDataFoundException as e:
             print(f'There is no data for {symbol}: {str(e)}')
-            start_date = 20180502
+            start_date = ds.query_next_trade_date(
+                minute_lib.read(symbol).metadata.get('last_date'))
         date_range = ds.query_trade_dates(start_date,
-                                            remote.newest_trade_date())
+                                          remote.newest_trade_date())
 
         # TODO: deal with IOError
         # -- reset date_range from date to today, sleep(60), continue to next loop
