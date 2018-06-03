@@ -16,11 +16,11 @@ def resample_bar(rule: str,
         'turnover': resampled['turnover'].sum(),
         'volume': resampled['volume'].sum()
     })
-    return result
+    return result.dropna()
 
 
 def combine_date_time_column(bar,
-                             date_column: str = 'trade_date',
+                             date_column: str = 'date',
                              time_column: str = 'time') -> pd.DataFrame:
     bar['datetime'] = jutil.combine_date_time(bar[date_column],
                                               bar[time_column])

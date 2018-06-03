@@ -6,9 +6,11 @@ from tqdm import tqdm
 import local
 import remote
 from remote_service import ds
+from datetime import datetime
 
 arctic = Arctic('192.168.199.217')
 basedata = arctic['basedata']
+SYMBOLS = basedata.read('instruments').data['symbol']
 
 
 def init_libraries():
@@ -76,6 +78,11 @@ def init_minute_lib():
     # TODO: store in database
     with open('minute_log.txt', 'w') as lh:
         lh.writelines(errors)
+
+
+def init_zen_lib():
+    arctic.delete_library('zen')
+    arctic.initialize_library('zen')
 
 
 def update_daily_lib():
@@ -147,10 +154,30 @@ def update_minute_lib():
                 })
 
 
+def update_zen_lib():
+    import zen
+    symbols = tqdm(SYMBOLS)
+    zen_lib = arctic['zen']
+
+    for symbol in symbols:
+        try:
+            day_bar = local.daily(symbol).loc[:, [
+                'close', 'high', 'low', 'open', 'symbol', 'trade_status',
+                'turnover', 'volume'
+            ]]
+            brush = zen.hist_sum(day_bar)
+            zen_lib.write(
+                symbol, brush, metadata={'updated': datetime.today()})
+        except Exception as e:
+            print(f'{symbol}: {str(e)}')
+
+
 if __name__ == '__main__':
     # init_libraries()
     # init_daily_lib()
     # update_instruments_document()
     # update_daily_lib()
     # init_minute_lib( )
-    update_minute_lib()
+    # update_minute_lib()
+    init_zen_lib()
+    update_zen_lib()

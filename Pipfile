@@ -13,6 +13,7 @@ sqlalchemy = "*"
 pymongo = "*"
 tqdm = "*"
 arctic = {git = "https://github.com/manahl/arctic.git"}
+ta-lib = "*"
 
 [dev-packages]
 pylint = "*"
