@@ -20,10 +20,7 @@ arctic = Arctic('pi3')
 BASEDATA_LIB = arctic['basedata']
 DAILY_LIB = arctic['daily']
 MINUTE_LIB = arctic['minute']
-
-
-def query_instruments() -> pd.DataFrame:
-    return BASEDATA_LIB.read('instruments').data
+ZEN_LIB = arctic['zen']
 
 
 def daily_last_date(symbol: str = '000001.SH') -> int:
@@ -65,6 +62,9 @@ def minute(symbol: str = '000001.SH',
     bar = tutil.combine_date_time_column(bar).set_index('datetime')
     freq = str(freq) + 'T'
     return tutil.resample_bar(freq, bar)
+
+def brush(symbol: str = '000001.SH') -> pd.DataFrame:
+    return ZEN_LIB.read(symbol).data
 
 
 if __name__ == '__main__':
