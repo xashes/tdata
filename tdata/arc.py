@@ -7,12 +7,15 @@ import local
 import remote
 from remote_service import ds
 from datetime import datetime
+import jaqs.util as jutil
 
 arctic = Arctic('pi3')
 basedata = arctic['basedata']
 SYMBOLS = basedata.read('instruments').data['symbol']
 
 # TODO: replace print with logging
+# TODO: refactor update and init functions
+# TODO: write test before refactor
 
 
 def init_libraries():
@@ -22,6 +25,12 @@ def init_libraries():
 
 
 def update_instruments_document():
+    if jutil.convert_datetime_to_int(
+            basedata.read('instruments').metadata.get(
+                'updated')) >= remote.newest_trade_date():
+        print('Instruments document is up to date.')
+        return
+
     stocks = remote.download_stock_table()
     idx = remote.download_index_table()
     instruments = pd.concat([stocks, idx], ignore_index=True)
@@ -97,7 +106,11 @@ def update_daily_lib():
     symbols = basedata.read('instruments').data['symbol']
     symbols = tqdm(symbols)
     daily_lib = arctic['daily']
-    newest_trade_date = remote.newest_trade_date()
+
+    if daily_lib.read('000001.SH').metadata.get(
+            'last_date') == remote.newest_trade_date():
+        print('The daily lib is up to date.')
+        return
 
     for symbol in symbols:
         try:
@@ -108,7 +121,10 @@ def update_daily_lib():
             start_date = 19900101
         try:
             df, _ = ds.daily(
-                symbol, start_date, newest_trade_date, adjust_mode='post')
+                symbol,
+                start_date,
+                remote.newest_trade_date(),
+                adjust_mode='post')
         except IOError as e:
             print(f'{symbol}: {str(e)}')
             continue
@@ -139,7 +155,7 @@ def update_minute_lib():
         except NoDataFoundException as e:
             print(f'There is no data for {symbol}: {str(e)}')
             start_date = ds.query_next_trade_date(
-                minute_lib.read(symbol).metadata.get('last_date'))
+                minute_lib.read('000001.SH').metadata.get('last_date'))
         date_range = ds.query_trade_dates(start_date,
                                           remote.newest_trade_date())
 
@@ -186,3 +202,4 @@ if __name__ == '__main__':
     update_instruments_document()
     update_daily_lib()
     update_minute_lib()
+    update_zen_lib()

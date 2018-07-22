@@ -29,7 +29,7 @@ def inter(brush_df):
     brushes = brush_df.loc[:, ['startpoint', 'endpoint']].values
     brushes = [(min(x), max(x)) for x in brushes]
     share = max(list(zip(*brushes))[0]), min(list(zip(*brushes))[1])
-    if share[0] <= share[1]:
+    if share[0] < share[1]:
         return share
 
 
