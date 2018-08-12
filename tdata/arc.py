@@ -144,8 +144,7 @@ def update_daily_lib():
 
 
 def update_minute_lib():
-    symbols = basedata.read('instruments').data['symbol']
-    symbols = tqdm(symbols)
+    symbols = tqdm(SYMBOLS)
     minute_lib = arctic['minute']
 
     for symbol in symbols:
@@ -202,4 +201,4 @@ if __name__ == '__main__':
     update_instruments_document()
     update_daily_lib()
     update_minute_lib()
-    update_zen_lib()
+    # update_zen_lib()
