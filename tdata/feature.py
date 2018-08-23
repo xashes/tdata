@@ -29,8 +29,7 @@ def sign_grp(se):
 
 
 def brush(df):
-    df = add_columns(df).copy()
-    df['macdgrps'] = sign_grp(df.macd > 0)
+    df.loc[:, 'macdgrps'] = sign_grp(df.macd > 0)
     macdgrps = df.groupby('macdgrps')
 
     def brush_index(grp):
@@ -49,3 +48,10 @@ def brush(df):
         data=macdgrps.apply(brush_point).values,
         index=macdgrps.apply(brush_index),
         columns=['endpoint'])
+
+def full_data(df):
+    data = add_columns(df).copy()
+    brush_data = brush(data)
+    data = brush_data.merge(data, how='outer', left_index=True, right_index=True)
+    data.loc[:, 'endpoint'] = data['endpoint'].interpolate(limit_direction='both')
+    return data
