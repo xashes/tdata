@@ -23,6 +23,14 @@ MINUTE_LIB = arctic['minute']
 ZEN_LIB = arctic['zen']
 
 
+def add_suffix_for_symbol(symbol):
+    if len(symbol) == 6:
+        if symbol.startswith('6'):
+            symbol = symbol + '.SH'
+        else:
+            symbol = symbol + '.SZ'
+    return symbol
+
 def daily_last_date(symbol: str = '000001.SH') -> int:
     return DAILY_LIB.read(symbol).metadata['last_date']
 
@@ -30,6 +38,7 @@ def daily_last_date(symbol: str = '000001.SH') -> int:
 def daily(symbol: str = '000001.SH',
           start_date: int = jutil.shift(today, n_weeks=-156),
           end_date: int = today) -> pd.DataFrame:
+    symbol = add_suffix_for_symbol(symbol)
     day_bar = DAILY_LIB.read(symbol).data.loc[start_date:end_date]
     day_bar.index = jutil.convert_int_to_datetime(day_bar.index)
     return day_bar.loc[:, [
