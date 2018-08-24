@@ -4,19 +4,20 @@ from tqdm import tqdm
 arctic = Arctic('pi3')
 basedata = arctic['basedata']
 SYMBOLS = basedata.read('instruments').data['symbol']
+minute_lib = arctic['minute']
+daily_lib = arctic['daily']
 
 
-def drop_broken_data(start_date):
+def drop_broken_data(start_date, lib):
     symbols = tqdm(SYMBOLS)
-    minute_lib = arctic['minute']
 
     for symbol in symbols:
         try:
-            data = minute_lib.read(symbol).data
+            data = lib.read(symbol).data
             after = data.index[data.index >= start_date]
             data = data.drop(after)
             last_date = data.index[-1]
-            minute_lib.write(
+            lib.write(
                 symbol,
                 data,
                 metadata={
@@ -28,4 +29,5 @@ def drop_broken_data(start_date):
 
 
 if __name__ == '__main__':
-    drop_broken_data(20180807)
+    drop_broken_data(20180823, lib=daily_lib)
+    drop_broken_data(20180820, lib=minute_lib)
