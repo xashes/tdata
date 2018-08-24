@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 jaqs = "*"
-"e1839a8" = {path = ".", editable = true}
 fire = "*"
 pytest = "*"
 sqlalchemy = "*"
@@ -14,6 +13,7 @@ pymongo = "*"
 tqdm = "*"
 arctic = {git = "https://github.com/manahl/arctic.git"}
 ta-lib = "*"
+tdata = {editable = true, path = "."}
 
 [dev-packages]
 pylint = "*"

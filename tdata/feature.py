@@ -12,6 +12,7 @@ def add_columns(df):
     df['macd'] = macd
     df['macdsignal'] = macdsignal
     df['macdhist'] = macdhist
+    df['macdgrps'] = sign_grp(df.macd > 0)
     df = df.dropna()
 
     return df
@@ -29,7 +30,9 @@ def sign_grp(se):
 
 
 def brush(df):
-    df.loc[:, 'macdgrps'] = sign_grp(df.macd > 0)
+    """
+    Need add columns first
+    """
     macdgrps = df.groupby('macdgrps')
 
     def brush_index(grp):

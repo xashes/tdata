@@ -201,4 +201,3 @@ if __name__ == '__main__':
     update_instruments_document()
     update_daily_lib()
     update_minute_lib()
-    # update_zen_lib()
