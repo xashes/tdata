@@ -1,6 +1,7 @@
 from tdata import local as tlocal
 from tdata import feature as tfeature
 from tdata import chart as tchart
+from tdata import remote
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pyecharts as pe

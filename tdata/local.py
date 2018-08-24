@@ -31,8 +31,13 @@ def add_suffix_for_symbol(symbol):
             symbol = symbol + '.SZ'
     return symbol
 
+
 def daily_last_date(symbol: str = '000001.SH') -> int:
     return DAILY_LIB.read(symbol).metadata['last_date']
+
+
+def minute_last_date(symbol: str = '000001.SH') -> int:
+    return MINUTE_LIB.read(symbol).metadata['last_date']
 
 
 def daily(symbol: str = '000001.SH',
@@ -71,6 +76,7 @@ def minute(symbol: str = '000001.SH',
     bar = tutil.combine_date_time_column(bar).set_index('datetime')
     freq = str(freq) + 'T'
     return tutil.resample_bar(freq, bar)
+
 
 def brush(symbol: str = '000001.SH') -> pd.DataFrame:
     return ZEN_LIB.read(symbol).data

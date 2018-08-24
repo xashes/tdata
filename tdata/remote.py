@@ -54,6 +54,11 @@ def remote_sample_bar():
     bar, msg = ds.bar(**props)
     return bar.tail()
 
+def remote_sample_daily():
+    props = dict(symbol='000001.SH', start_date=jutil.shift(today, n_weeks=-1), end_date=today)
+    daily, msg = ds.daily(**props)
+    return daily
+
 
 def remote_uptodate() -> bool:
     bar = remote_sample_bar()
