@@ -15,6 +15,9 @@ def add_columns(df):
     df['macdgrps'] = sign_grp(df.macd > 0)
     df = df.dropna()
 
+    # add brush data
+    df = df.merge(brush(df), how='outer', left_index=True, right_index=True)
+
     return df
 
 
@@ -48,13 +51,5 @@ def brush(df):
             return grp['low'].min()
 
     return pd.DataFrame(
-        data=macdgrps.apply(brush_point).values,
-        index=macdgrps.apply(brush_index),
-        columns=['endpoint'])
-
-def full_data(df):
-    data = add_columns(df).copy()
-    brush_data = brush(data)
-    data = brush_data.merge(data, how='outer', left_index=True, right_index=True)
-    data.loc[:, 'endpoint'] = data['endpoint'].interpolate(limit_direction='both')
-    return data
+        data={'brushpoint': macdgrps.apply(brush_point).values},
+        index=macdgrps.apply(brush_index))

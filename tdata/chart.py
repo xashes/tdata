@@ -1,11 +1,11 @@
 from pyecharts import Kline, Bar, Line
 from pyecharts import Grid, Overlap
-from tdata import feature
 
 
 def brush(data):
-    # data preprocessing
-    data = feature.full_data(data)
+    """
+    Need data be preprocessed by feature.add_columns()
+    """
 
     # top grid
     kline = Kline()
@@ -23,7 +23,10 @@ def brush(data):
     )
 
     brush = Line()
-    brush.add('Brush', data.index, data.endpoint)
+    brush.add(
+        'Brush',
+        data.index,
+        data.brushpoint.interpolate(limit_direction='both'))
     overlap = Overlap()
     overlap.add(kline)
     overlap.add(brush)
@@ -34,8 +37,8 @@ def brush(data):
         'macdhist',
         data.index,
         data.macdhist.values,
-        mark_line=['max', 'min'], legend_pos='68%'
-    )
+        mark_line=['max', 'min'],
+        legend_pos='68%')
 
     macd = Line()
     macd.add('macd', data.index, data.macd)

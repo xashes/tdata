@@ -14,6 +14,7 @@ tqdm = "*"
 arctic = {git = "https://github.com/manahl/arctic.git"}
 ta-lib = "*"
 tdata = {editable = true, path = "."}
+"flake8" = "*"
 
 [dev-packages]
 pylint = "*"
