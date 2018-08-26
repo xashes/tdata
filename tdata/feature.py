@@ -17,6 +17,7 @@ def add_columns(df):
 
     # add brush data
     df = df.merge(brush(df), how='outer', left_index=True, right_index=True)
+    df = df.merge(center(df), how='outer', left_index=True, right_index=True)
 
     return df
 

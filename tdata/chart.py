@@ -1,5 +1,6 @@
 from pyecharts import Kline, Bar, Line
 from pyecharts import Grid, Overlap
+from tdata import feature
 
 
 def brush(data):
@@ -22,11 +23,26 @@ def brush(data):
         is_more_utils=True,
     )
 
+
     brush = Line()
     brush.add(
         'Brush',
         data.index,
-        data.brushend.interpolate(limit_direction='both'))
+        data.brushend.interpolate(limit_direction='both'),
+    )
+    brush.add(
+        'Bottom',
+        data.index,
+        data.bottom.fillna(method='bfill').fillna(method='ffill'),
+        is_step=True,
+    )
+    brush.add(
+        'Top',
+        data.index,
+        data.top.fillna(method='bfill').fillna(method='ffill'),
+        is_step=True,
+    )
+
     overlap = Overlap()
     overlap.add(kline)
     overlap.add(brush)
