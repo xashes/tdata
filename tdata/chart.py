@@ -26,7 +26,7 @@ def brush(data):
     brush.add(
         'Brush',
         data.index,
-        data.brushpoint.interpolate(limit_direction='both'))
+        data.brushend.interpolate(limit_direction='both'))
     overlap = Overlap()
     overlap.add(kline)
     overlap.add(brush)
