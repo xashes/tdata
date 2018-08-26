@@ -41,7 +41,7 @@ def minute_last_date(symbol: str = '000001.SH') -> int:
 
 
 def daily(symbol: str = '000001.SH',
-          start_date: int = jutil.shift(today, n_weeks=-156),
+          start_date: int = jutil.shift(today, n_weeks=-208),
           end_date: int = today) -> pd.DataFrame:
     symbol = add_suffix_for_symbol(symbol)
     day_bar = DAILY_LIB.read(symbol).data.loc[start_date:end_date]

@@ -12,8 +12,9 @@ def add_columns(df):
     df['macd'] = macd
     df['macdsignal'] = macdsignal
     df['macdhist'] = macdhist
+    df.dropna(inplace=True)
     df['macdgrps'] = sign_grp(df.macd > 0)
-    df = df.dropna()
+    df['macdhistgrps'] = sign_grp(df.macdhist > 0)
 
     # add brush data
     df = df.merge(brush(df), how='outer', left_index=True, right_index=True)
@@ -60,6 +61,8 @@ def center(df):
     """
     input: df with columns added by add_columns()
     """
+    # TODO center bounds and center combining
+
     brush = df[df.brushend.notna()].copy()
     brush['brushstart'] = brush.brushend.shift(1)
     brush = brush.dropna()
