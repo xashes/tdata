@@ -20,3 +20,4 @@ tdata = {editable = true, path = "."}
 pylint = "*"
 twine = "*"
 "flake8" = "*"
+ipdb = "*"

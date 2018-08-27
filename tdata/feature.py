@@ -79,7 +79,7 @@ def center(df):
 
     while len(vecs) > 3:
         center_map = {'bottom': 'cummax', 'top': 'cummin'}
-        is_intersect = 'bottom < top'
+        is_intersect = 'bottom <= top'
         is_out = 'bottom > top'
 
         candi = vecs.transform(center_map).query(is_intersect)
