@@ -6,7 +6,7 @@ from arctic import Arctic
 
 arctic = Arctic('pi3')
 basedata = arctic['basedata']
-SYMBOLS = basedata.read('instruments').data['symbol']
+SYMBOLS = basedata.read('instruments').data['symbol'].iloc[5:500]
 
 def scan_first_buy():
     symbols = tqdm(SYMBOLS)

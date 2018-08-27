@@ -96,8 +96,8 @@ def center(df):
             else:
                 vecs = vecs.drop(outlier_index)
                 candi = candi2.copy()
-                if len(vecs) - len(candi) < 3:
-                    center = center.append(candi.iloc[-1])
-                    vecs = vecs.drop(candi.index)
+        else:
+            center = center.append(candi.iloc[-1])
+            vecs = vecs.drop(candi.index)
 
     return center

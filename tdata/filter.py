@@ -40,12 +40,12 @@ def first_buy(symbol):
 
     try:
         center_start_grp = df.loc[df.bottom.notna(), 'macdgrps'].iloc[-2]
-    except IndexError as e:
-        print(f'{symbol}: {str(e)}')
-        center_start_grp = 1
     except Exception as e:
         print(f'{symbol}: {str(e)}')
-        return
+        center_start_grp = 0
+    # except Exception as e:
+    #     print(f'{symbol}: {str(e)}')
+    #     return
 
     # TODO lower than center low bounder
 
