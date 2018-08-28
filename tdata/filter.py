@@ -23,7 +23,7 @@ def exhausted(df):
         return True
 
 
-def first_buy(symbol):
+def first_buy(symbol, freq='D'):
     """
     only roughly use daily bar for now, need to improve latter
     """

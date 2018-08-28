@@ -53,7 +53,7 @@ def daily(symbol: str = '000001.SH',
 
 
 def weekly(symbol: str = '000001.SH',
-           start_date: int = jutil.shift(today, n_weeks=-626),
+           start_date: int = jutil.shift(today, n_weeks=-826),
            end_date: int = today) -> pd.DataFrame:
     day_bar = daily(symbol, start_date, end_date)
     return tutil.resample_bar('W', bar=day_bar)
@@ -72,10 +72,36 @@ def minute(symbol: str = '000001.SH',
            start_date: int = jutil.shift(today, n_weeks=-4),
            end_date: int = today,
            freq: int = 1) -> pd.DataFrame:
+    # TODO fix resample period bigger than 30
+
     bar = MINUTE_LIB.read(symbol).data.loc[start_date:end_date]
     bar = tutil.combine_date_time_column(bar).set_index('datetime')
     freq = str(freq) + 'T'
     return tutil.resample_bar(freq, bar)
+
+
+def bar(symbol: str = '000001.SH',
+        period: int = 1000,
+        end_date: int = today,
+        freq='D'):
+    if freq == 'D':
+        start_date = jutil.shift(today, n_weeks=-int(period / 5))
+        return daily(symbol, start_date)
+    elif freq == 'W':
+        start_date = jutil.shift(today, n_weeks=-period)
+        return weekly(symbol, start_date)
+    elif freq == 'M':
+        start_date = 19901219
+        return monthly(symbol, start_date)
+    else:
+        try:
+            freq = int(freq)
+            weeks_delta = int(period * freq / (240 * 5) + 1)
+            start_date = jutil.shift(today, n_weeks=-weeks_delta)
+            return minute(symbol, start_date, freq=freq)
+        except Exception as e:
+            print(f'Error on {symbol} with frequency: {str(freq)}')
+            print(f'Error message: {str(e)}')
 
 
 def brush(symbol: str = '000001.SH') -> pd.DataFrame:

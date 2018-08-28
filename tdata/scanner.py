@@ -19,8 +19,7 @@ def scan_first_buy():
         except Exception as e:
             pass
 
-    with open('targets.txt', 'w') as fh:
-        fh.writelines(targets)
+    return targets
 
 
 if __name__ == '__main__':

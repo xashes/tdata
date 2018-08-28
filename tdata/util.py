@@ -4,19 +4,21 @@ import pandas as pd
 import jaqs.util as jutil
 
 
-def resample_bar(rule: str,
-                 bar: pd.DataFrame) -> pd.DataFrame:
-    resampled = bar.resample(rule, closed='right', label='right')
-    result = pd.DataFrame({
-        'close': resampled['close'].last(),
-        'high': resampled['high'].max(),
-        'low': resampled['low'].min(),
-        'open': resampled['open'].first(),
-        'symbol': bar['symbol'].iloc[0],
-        'turnover': resampled['turnover'].sum(),
-        'volume': resampled['volume'].sum()
-    })
-    return result.dropna()
+def resample_bar(rule: str, bar: pd.DataFrame) -> pd.DataFrame:
+    try:
+        resampled = bar.resample(rule, closed='right', label='right')
+        result = pd.DataFrame({
+            'close': resampled['close'].last(),
+            'high': resampled['high'].max(),
+            'low': resampled['low'].min(),
+            'open': resampled['open'].first(),
+            'symbol': bar['symbol'].iloc[0],
+            'turnover': resampled['turnover'].sum(),
+            'volume': resampled['volume'].sum()
+        })
+        return result.dropna()
+    except Exception as e:
+        print('Resample Error: {str(e)}')
 
 
 def combine_date_time_column(bar,
