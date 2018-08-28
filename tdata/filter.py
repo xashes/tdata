@@ -23,14 +23,13 @@ def exhausted(df):
         return True
 
 
-def first_buy(symbol, freq='D'):
+def first_buy(df):
     """
-    only roughly use daily bar for now, need to improve latter
+    input: pd.DataFrame with columns added
     """
-    print(f'Start processing {symbol}')
     try:
-        df = local.daily(symbol)
-        df = feature.add_columns(df)
+        symbol = df.symbol.iloc[0]
+        print(f'Start processing {symbol}')
     except Exception as e:
         print(f'{symbol}: {str(e)}')
         return
@@ -64,7 +63,7 @@ def first_buy(symbol, freq='D'):
             return True
 
         hist_length = groups['macdhist'].agg(lambda grp: max(grp, key=abs))
-        if hist_length.iloc[-1] / hist_length.min() > 1 / 2:
+        if hist_length.iloc[-1] / hist_length.min() > 1 / 2 or (hist_length.iloc[-1] == hist_length.max()):
             print('the macd hist is too long to the down side')
             return True
 
