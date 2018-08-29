@@ -1,7 +1,6 @@
 from tdata import local as tlocal
 from tdata import feature as tfeature
 from tdata import chart as tchart
-from tdata import remote
 from tdata import filter as tfilter
 from tdata import scanner as tscanner
 import seaborn as sns

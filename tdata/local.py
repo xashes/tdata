@@ -55,6 +55,7 @@ def daily(symbol: str = '000001.SH',
 def weekly(symbol: str = '000001.SH',
            start_date: int = jutil.shift(today, n_weeks=-826),
            end_date: int = today) -> pd.DataFrame:
+    symbol = add_suffix_for_symbol(symbol)
     day_bar = daily(symbol, start_date, end_date)
     return tutil.resample_bar('W', bar=day_bar)
 
@@ -62,6 +63,7 @@ def weekly(symbol: str = '000001.SH',
 def monthly(symbol: str = '000001.SH',
             start_date: int = 19901219,
             end_date: int = today) -> pd.DataFrame:
+    symbol = add_suffix_for_symbol(symbol)
     day_bar = daily(symbol, start_date, end_date)
     return tutil.resample_bar('M', bar=day_bar)
 
@@ -74,6 +76,7 @@ def minute(symbol: str = '000001.SH',
            freq: int = 1) -> pd.DataFrame:
     # TODO fix resample period bigger than 30
 
+    symbol = add_suffix_for_symbol(symbol)
     bar = MINUTE_LIB.read(symbol).data.loc[start_date:end_date]
     bar = tutil.combine_date_time_column(bar).set_index('datetime')
     freq = str(freq) + 'T'
@@ -84,21 +87,22 @@ def bar(symbol: str = '000001.SH',
         period: int = 1000,
         end_date: int = today,
         freq='D'):
+    symbol = add_suffix_for_symbol(symbol)
     if freq == 'D':
-        start_date = jutil.shift(today, n_weeks=-int(period / 5))
-        return daily(symbol, start_date)
+        start_date = jutil.shift(end_date, n_weeks=-int(period / 5))
+        return daily(symbol, start_date, end_date)
     elif freq == 'W':
-        start_date = jutil.shift(today, n_weeks=-period)
-        return weekly(symbol, start_date)
+        start_date = jutil.shift(end_date, n_weeks=-period)
+        return weekly(symbol, start_date, end_date)
     elif freq == 'M':
         start_date = 19901219
-        return monthly(symbol, start_date)
+        return monthly(symbol, start_date, end_date)
     else:
         try:
             freq = int(freq)
             weeks_delta = int(period * freq / (240 * 5) + 1)
             start_date = jutil.shift(today, n_weeks=-weeks_delta)
-            return minute(symbol, start_date, freq=freq)
+            return minute(symbol, start_date, end_date, freq=freq)
         except Exception as e:
             print(f'Error on {symbol} with frequency: {str(freq)}')
             print(f'Error message: {str(e)}')
