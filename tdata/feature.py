@@ -4,6 +4,13 @@ import talib
 
 
 def add_columns(df):
+
+    # deal with 停牌 data
+    try:
+        df.loc[df['trade_status']=='停牌', ['high', 'low', 'open']] = df.close
+    except:
+        pass
+
     # add log return and moving vol
     df['return'] = np.log(df['close'] / df['close'].shift(1))
 

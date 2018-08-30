@@ -29,5 +29,5 @@ def drop_broken_data(start_date, lib):
 
 
 if __name__ == '__main__':
-    drop_broken_data(20180823, lib=daily_lib)
-    # drop_broken_data(20180820, lib=minute_lib)
+    # drop_broken_data(20180823, lib=daily_lib)
+    drop_broken_data(20180829, lib=minute_lib)

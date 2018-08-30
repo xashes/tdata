@@ -72,9 +72,9 @@ def brush(data):
         data.turnover.values / pow(10, 6),
         mark_line=['max', 'min'])
 
-    grid = Grid('', width='100%', height=1200)
-    grid.add(overlap, grid_bottom='45%')
-    grid.add(middle, grid_top='57%', grid_bottom='17%')
-    grid.add(turnover, grid_top='85%')
+    grid = Grid('', width='100%', height=1160)
+    grid.add(overlap, grid_bottom='40%')
+    grid.add(middle, grid_top='62%', grid_bottom='14%')
+    grid.add(turnover, grid_top='88%')
 
     return grid

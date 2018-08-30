@@ -7,7 +7,7 @@ from arctic import Arctic
 
 arctic = Arctic('pi3')
 basedata = arctic['basedata']
-SYMBOLS = basedata.read('instruments').data['symbol'].iloc[5:500]
+SYMBOLS = basedata.read('instruments').data['symbol']
 
 
 def scan_first_buy(end_date=local.today):
