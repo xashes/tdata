@@ -1,18 +1,13 @@
+import pandas as pd
 from tdata import filter as tfilter
 from tdata import local, feature
 from tqdm import tqdm
 from collections import defaultdict
 
-from arctic import Arctic
-
-arctic = Arctic('pi3')
-basedata = arctic['basedata']
-SYMBOLS = basedata.read('instruments').data['symbol']
-
 
 def scan_first_buy(end_date=local.today):
     # TODO 排除停牌股票
-    symbols = tqdm(SYMBOLS)
+    symbols = tqdm(local.SYMBOLS)
 
     freqs = ['M', 'W', 'D', 30]
     targets = defaultdict(list)
@@ -27,6 +22,22 @@ def scan_first_buy(end_date=local.today):
                 pass
 
     return targets
+
+
+def last_center_matrix(end_date=local.today, freq='D'):
+    symbols = tqdm(local.SYMBOLS)
+    matrix = pd.DataFrame()
+
+    for s in symbols:
+        try:
+            df = local.bar(s, end_date=end_date, freq=freq)
+            if df.trade_status.iloc[-1] != '交易':
+                continue
+            df = feature.add_columns(df)
+            matrix = matrix.append(feature.last_center(df), ignore_index=True)
+        except:
+            pass
+    return matrix
 
 
 if __name__ == '__main__':

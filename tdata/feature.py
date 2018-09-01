@@ -1,13 +1,15 @@
 import numpy as np
 import pandas as pd
 import talib
+from tadta import local
+from tqdm import tqdm
 
 
 def add_columns(df):
 
     # deal with 停牌 data
     try:
-        df.loc[df['trade_status']=='停牌', ['high', 'low', 'open']] = df.close
+        df = df.drop[df['trade_status']=='停牌']
     except:
         pass
 
@@ -109,3 +111,28 @@ def center(df):
             vecs = vecs.drop(candi.index)
 
     return center
+
+def last_center(df):
+    """
+    input: df with columns added
+    """
+    centers = df[df.top.notna()]
+    last_center = df.loc[df.macdgrps >= centers.iloc[-2].macdgrps]
+
+    data = dict()
+
+    data['symbol'] = last_center.symbol.values[0]
+    data['brush'] = last_center.brushend.dropna().values
+
+    data['bottom'] = last_center.bottom.dropna().values[-1]
+
+    data['top'] = last_center.top.dropna().values[-1]
+
+    data['macdgrps'] = last_center.loc[:, ['macd', 'macdhist', 'macdhistgrps']].groupby(last_center.macdgrps)
+    data['lastgrp'] = data['macdgrps'].get_group(last_center.macdgrps.iloc[-1]).groupby('macdhistgrps')
+
+    data['macd_length'] = data['macdgrps']['macd'].agg(lambda x: max(x, key=abs)).values
+    data['hist_length'] = data['macdgrps']['macdhist'].agg(lambda x: max(x, key=abs)).values
+
+    return pd.DataFrame.from_dict(data, orient='index').T
+

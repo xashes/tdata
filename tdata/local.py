@@ -21,6 +21,7 @@ BASEDATA_LIB = arctic['basedata']
 DAILY_LIB = arctic['daily']
 MINUTE_LIB = arctic['minute']
 ZEN_LIB = arctic['zen']
+SYMBOLS = BASEDATA_LIB.read('instruments').data.symbol.values
 
 
 def add_suffix_for_symbol(symbol):
