@@ -8,7 +8,7 @@ minute_lib = arctic['minute']
 daily_lib = arctic['daily']
 
 
-def drop_broken_data(start_date, lib):
+def drop_broken_data(start_date, lib=minute_lib):
     symbols = tqdm(SYMBOLS)
 
     for symbol in symbols:
@@ -29,5 +29,5 @@ def drop_broken_data(start_date, lib):
 
 
 if __name__ == '__main__':
-    # drop_broken_data(20180823, lib=daily_lib)
-    drop_broken_data(20180830, lib=minute_lib)
+    import fire
+    fire.Fire()

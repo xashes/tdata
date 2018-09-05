@@ -15,6 +15,7 @@ arctic = {git = "https://github.com/manahl/arctic.git"}
 ta-lib = "*"
 tdata = {editable = true, path = "."}
 "flake8" = "*"
+pyecharts = "*"
 
 [dev-packages]
 pylint = "*"

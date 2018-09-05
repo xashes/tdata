@@ -1,20 +1,20 @@
 import numpy as np
 import pandas as pd
 import talib
-from tadta import local
-from tqdm import tqdm
 
 
 def add_columns(df):
 
     # deal with 停牌 data
     try:
-        df = df.drop[df['trade_status']=='停牌']
+        df = df.drop(
+            df[(df.trade_status == '停牌') | (df.close == 0) | (df.open == 0)
+               | (df.low == 0) | (df.high == 0)].index)
     except:
         pass
 
     # add log return and moving vol
-    df['return'] = np.log(df['close'] / df['close'].shift(1))
+    # df['return'] = np.log(df['close'] / df['close'].shift(1))
 
     # add macd related
     macd, macdsignal, macdhist = talib.MACD(df.close.values)
@@ -112,6 +112,7 @@ def center(df):
 
     return center
 
+
 def last_center(df):
     """
     input: df with columns added
@@ -128,11 +129,15 @@ def last_center(df):
 
     data['top'] = last_center.top.dropna().values[-1]
 
-    data['macdgrps'] = last_center.loc[:, ['macd', 'macdhist', 'macdhistgrps']].groupby(last_center.macdgrps)
-    data['lastgrp'] = data['macdgrps'].get_group(last_center.macdgrps.iloc[-1]).groupby('macdhistgrps')
+    # TODO: whether use brush instead of macd to group
+    data['macdgrps'] = last_center.loc[:, ['macd', 'macdhist', 'macdhistgrps'
+                                           ]].groupby(last_center.macdgrps)
+    data['lastgrp'] = data['macdgrps'].get_group(
+        last_center.macdgrps.iloc[-1]).groupby('macdhistgrps')
 
-    data['macd_length'] = data['macdgrps']['macd'].agg(lambda x: max(x, key=abs)).values
-    data['hist_length'] = data['macdgrps']['macdhist'].agg(lambda x: max(x, key=abs)).values
+    data['macd_length'] = data['macdgrps']['macd'].agg(
+        lambda x: max(x, key=abs)).values
+    data['hist_length'] = data['macdgrps']['macdhist'].agg(
+        lambda x: max(x, key=abs)).values
 
     return pd.DataFrame.from_dict(data, orient='index').T
-

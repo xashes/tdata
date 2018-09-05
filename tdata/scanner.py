@@ -24,15 +24,18 @@ def scan_first_buy(end_date=local.today):
     return targets
 
 
-def last_center_matrix(end_date=local.today, freq='D'):
-    symbols = tqdm(local.SYMBOLS)
+def last_center_matrix(symbols=local.SYMBOLS, end_date=local.today, freq='D'):
+    symbols = tqdm(symbols)
     matrix = pd.DataFrame()
 
     for s in symbols:
         try:
             df = local.bar(s, end_date=end_date, freq=freq)
-            if df.trade_status.iloc[-1] != '交易':
-                continue
+            try:
+                if df.trade_status.iloc[-1] != '交易':
+                    continue
+            except:
+                pass
             df = feature.add_columns(df)
             matrix = matrix.append(feature.last_center(df), ignore_index=True)
         except:

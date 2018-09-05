@@ -57,8 +57,8 @@ def brush(data):
         legend_pos='68%')
 
     macd = Line()
-    macd.add('macd', data.index, data.macd)
-    macd.add('macd signal', data.index, data.macdsignal)
+    macd.add('macd', data.index, data.macd, symbol=None, line_color='orange')
+    macd.add('macd signal', data.index, data.macdsignal, symbol=None, line_color='cyan')
 
     middle = Overlap()
     middle.add(macdhist)

@@ -102,6 +102,11 @@ def init_zen_lib():
     arctic.initialize_library('zen')
 
 
+def init_center_lib():
+    arctic.delete_library('center')
+    arctic.initialize_library('center')
+
+
 def update_daily_lib():
     symbols = basedata.read('instruments').data['symbol']
     symbols = tqdm(symbols)
@@ -197,7 +202,19 @@ def update_zen_lib():
             print(f'{symbol}: {str(e)}')
 
 
+def update_center_lib():
+    import scanner
+    center_lib = arctic['center']
+
+    freqs = [30, 15, 5]
+    for freq in freqs:
+        matrix = scanner.last_center_matrix(freq=freq)
+        center_lib.write(str(freq), matrix)
+
+
 if __name__ == '__main__':
+    import fire
+    fire.Fire()
     update_instruments_document()
     update_daily_lib()
     update_minute_lib()
