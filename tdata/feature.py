@@ -123,21 +123,50 @@ def last_center(df):
     data = dict()
 
     data['symbol'] = last_center.symbol.values[0]
-    data['brush'] = last_center.brushend.dropna().values
+    brushends = last_center.brushend.dropna().values
 
+    # center
     data['bottom'] = last_center.bottom.dropna().values[-1]
-
     data['top'] = last_center.top.dropna().values[-1]
 
+    # brush
+    data['brush_count'] = len(brushends) - 1
+    data['brush_-1'] = brushends[-1]
+    data['brush_-2'] = brushends[-2]
+    data['brush_-3'] = brushends[-3]
+    data['brush_-4'] = brushends[-4]
+
+    # macd
+    data['macd_mean'] = last_center.macd.mean()
+    data['hist_mean'] = last_center.macdhist.mean()
+
     # TODO: whether use brush instead of macd to group
-    data['macdgrps'] = last_center.loc[:, ['macd', 'macdhist', 'macdhistgrps'
-                                           ]].groupby(last_center.macdgrps)
-    data['lastgrp'] = data['macdgrps'].get_group(
-        last_center.macdgrps.iloc[-1]).groupby('macdhistgrps')
+    macdgrps = last_center.loc[:, ['macd', 'macdhist', 'macdhistgrps'
+                                   ]].groupby(last_center.macdgrps)
+    lastgrp = macdgrps.get_group(last_center.macdgrps.iloc[-1])
+    tail_histgrps = lastgrp.groupby('macdhistgrps')
 
-    data['macd_length'] = data['macdgrps']['macd'].agg(
-        lambda x: max(x, key=abs)).values
-    data['hist_length'] = data['macdgrps']['macdhist'].agg(
-        lambda x: max(x, key=abs)).values
+    # macd groups
+    macd_length = macdgrps['macd'].agg(lambda x: max(x, key=abs)).values
+    data['macd_max'] = macd_length.max()
+    data['macd_min'] = macd_length.min()
+    data['macd_-1'] = macd_length[-1]
+    data['macd_-2'] = macd_length[-2]
+    data['macd_-3'] = macd_length[-3]
 
-    return pd.DataFrame.from_dict(data, orient='index').T
+    hist_length = macdgrps['macdhist'].agg(lambda x: max(x, key=abs)).values
+    data['hist_max'] = hist_length.max()
+    data['hist_min'] = hist_length.min()
+    data['hist_-1'] = hist_length[-1]
+    data['hist_-2'] = hist_length[-2]
+    data['hist_-3'] = hist_length[-3]
+
+    # last group
+    # TODO: data['tail_macd_length'] - how to compute this depend on hist sign
+    data['lastgrp_kcount'] = len(lastgrp)
+    tail_hist_length = tail_histgrps['macdhist'].agg(lambda x: max(x, key=abs)).values
+    data['tail_hist_max'] = tail_hist_length.max()
+    data['tail_hist_min'] = tail_hist_length.min()
+    data['tail_hist_-1'] = tail_hist_length[-1]
+
+    return pd.DataFrame.from_dict(data, orient='index').T.set_index('symbol')

@@ -213,8 +213,6 @@ def update_center_lib():
 
 
 if __name__ == '__main__':
-    import fire
-    fire.Fire()
     update_instruments_document()
     update_daily_lib()
     update_minute_lib()
