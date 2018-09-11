@@ -14,7 +14,7 @@ def add_columns(df):
         pass
 
     # add log return and moving vol
-    # df['return'] = np.log(df['close'] / df['close'].shift(1))
+    df['return'] = np.log(df['close'] / df['close'].shift(1))
 
     # add macd related
     macd, macdsignal, macdhist = talib.MACD(df.close.values)
@@ -72,17 +72,24 @@ def center(df):
     """
     # TODO center bounds and center combining
 
-    brush = df[df.brushend.notna()].copy()
+    brush = df[df.brushend.notnull()].copy()
     brush['brushstart'] = brush.brushend.shift(1)
     brush = brush.dropna()
 
     # generate feature vector
-    vecs = brush[['brushstart', 'brushend']].copy().apply(
-        sorted, axis=1,
-        result_type='broadcast').rename(columns={
-            'brushstart': 'bottom',
-            'brushend': 'top'
-        })
+    if pd.__version__ < str(0.23):
+        vecs = brush[['brushstart', 'brushend']].copy().apply(
+            sorted, axis=1, broadcast=True).rename(columns={
+                'brushstart': 'bottom',
+                'brushend': 'top'
+            })
+    else:
+        vecs = brush[['brushstart', 'brushend']].copy().apply(
+            sorted, axis=1,
+            result_type='broadcast').rename(columns={
+                'brushstart': 'bottom',
+                'brushend': 'top'
+            })
 
     center = pd.DataFrame(columns='bottom top'.split())
 
@@ -113,14 +120,23 @@ def center(df):
     return center
 
 
-def last_center(df):
+def last_center(df, target=None):
     """
-    input: df with columns added
+    input: df without columns added
+           target -> number or None
     """
-    centers = df[df.top.notna()]
-    last_center = df.loc[df.macdgrps >= centers.iloc[-2].macdgrps]
-
     data = dict()
+
+    if target:
+        target_df = df.iloc[-target:]
+        df = df.drop(df.index[-target:])
+        data['max_return'] = target_df.high.max() / df.close[-1] - 1
+        data['max_loss'] = target_df.low.min() / df.close[-1] - 1
+        data['return'] = target_df.close[-1] / df.close[-1] - 1
+
+    df = add_columns(df)
+    centers = df[df.top.notnull()]
+    last_center = df.loc[df.macdgrps >= centers.iloc[-2].macdgrps]
 
     data['symbol'] = last_center.symbol.values[0]
     brushends = last_center.brushend.dropna().values
@@ -131,10 +147,10 @@ def last_center(df):
 
     # brush
     data['brush_count'] = len(brushends) - 1
-    data['brush_-1'] = brushends[-1]
-    data['brush_-2'] = brushends[-2]
-    data['brush_-3'] = brushends[-3]
-    data['brush_-4'] = brushends[-4]
+    data['brush_1'] = brushends[-1]
+    data['brush_2'] = brushends[-2]
+    data['brush_3'] = brushends[-3]
+    data['brush_4'] = brushends[-4]
 
     # macd
     data['macd_mean'] = last_center.macd.mean()
@@ -150,23 +166,26 @@ def last_center(df):
     macd_length = macdgrps['macd'].agg(lambda x: max(x, key=abs)).values
     data['macd_max'] = macd_length.max()
     data['macd_min'] = macd_length.min()
-    data['macd_-1'] = macd_length[-1]
-    data['macd_-2'] = macd_length[-2]
-    data['macd_-3'] = macd_length[-3]
+    data['macd_1'] = macd_length[-1]
+    data['macd_2'] = macd_length[-2]
+    data['macd_3'] = macd_length[-3]
+    data['macd_4'] = macd_length[-4]
 
     hist_length = macdgrps['macdhist'].agg(lambda x: max(x, key=abs)).values
     data['hist_max'] = hist_length.max()
     data['hist_min'] = hist_length.min()
-    data['hist_-1'] = hist_length[-1]
-    data['hist_-2'] = hist_length[-2]
-    data['hist_-3'] = hist_length[-3]
+    data['hist_1'] = hist_length[-1]
+    data['hist_2'] = hist_length[-2]
+    data['hist_3'] = hist_length[-3]
+    data['hist_4'] = hist_length[-4]
 
     # last group
     # TODO: data['tail_macd_length'] - how to compute this depend on hist sign
     data['lastgrp_kcount'] = len(lastgrp)
-    tail_hist_length = tail_histgrps['macdhist'].agg(lambda x: max(x, key=abs)).values
+    tail_hist_length = tail_histgrps['macdhist'].agg(
+        lambda x: max(x, key=abs)).values
     data['tail_hist_max'] = tail_hist_length.max()
     data['tail_hist_min'] = tail_hist_length.min()
-    data['tail_hist_-1'] = tail_hist_length[-1]
+    data['tail_hist_1'] = tail_hist_length[-1]
 
     return pd.DataFrame.from_dict(data, orient='index').T.set_index('symbol')

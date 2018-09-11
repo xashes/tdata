@@ -29,17 +29,20 @@ def brush(data):
         'Brush',
         data.index,
         data.brushend.interpolate(limit_direction='both'),
+        symbol=None,
     )
     brush.add(
         'Bottom',
         data.index,
         data.bottom.fillna(method='bfill').fillna(method='ffill'),
+        symbol=None,
         is_step=True,
     )
     brush.add(
         'Top',
         data.index,
         data.top.fillna(method='bfill').fillna(method='ffill'),
+        symbol=None,
         is_step=True,
     )
 

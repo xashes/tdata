@@ -3,6 +3,7 @@ from tdata import filter as tfilter
 from tdata import local, feature
 from tqdm import tqdm
 from collections import defaultdict
+import jaqs.util as jutil
 
 
 def scan_first_buy(end_date=local.today):
@@ -24,23 +25,37 @@ def scan_first_buy(end_date=local.today):
     return targets
 
 
-def last_center_matrix(symbols=local.SYMBOLS, end_date=local.today, freq='D'):
+def drop_symbol(symbol):
+    pass
+
+
+def last_center_matrix(symbols=local.SYMBOLS,
+                       end_date=local.today,
+                       freq='D',
+                       target=None):
     symbols = tqdm(symbols)
     matrix = pd.DataFrame()
 
     for s in symbols:
         try:
             df = local.bar(s, end_date=end_date, freq=freq)
-            try:
-                if df.trade_status.iloc[-1] != '交易':
-                    continue
-            except:
-                pass
-            df = feature.add_columns(df)
-            matrix = matrix.append(feature.last_center(df), ignore_index=True)
+            if df.high.iloc[-1] == 0:
+                continue
+
+            matrix = matrix.append(feature.last_center(df, target=target))
         except:
             pass
     return matrix
+
+
+def matrix_from_different_date():
+    dates = pd.date_range(end='2018-09-08', periods=5, freq='3M')
+    dataset = pd.DataFrame()
+    for dt in dates:
+        dataset = dataset.append(
+            last_center_matrix(
+                end_date=jutil.convert_datetime_to_int(dt), target=20))
+    return dataset
 
 
 if __name__ == '__main__':

@@ -1,8 +1,8 @@
-from tdata import local as tlocal
-from tdata import feature as tfeature
+from tdata import local
+from tdata import feature
 from tdata import chart as tchart
-from tdata import filter as tfilter
-from tdata import scanner as tscanner
+from tdata import filters
+from tdata import scanner
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pyecharts as pe
