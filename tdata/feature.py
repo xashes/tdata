@@ -7,9 +7,8 @@ def add_columns(df):
 
     # deal with 停牌 data
     try:
-        df = df.drop(
-            df[(df.trade_status == '停牌') | (df.close == 0) | (df.open == 0)
-               | (df.low == 0) | (df.high == 0)].index)
+        df = df.drop(df[(df.close == 0) | (df.open == 0)
+                        | (df.low == 0) | (df.high == 0)].index)
     except:
         pass
 

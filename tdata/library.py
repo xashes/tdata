@@ -12,3 +12,4 @@ import altair as alt
 from imp import reload
 
 sns.set()
+alt.data_transformers.enable('json')
