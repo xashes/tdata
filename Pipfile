@@ -16,9 +16,11 @@ ta-lib = "*"
 tdata = {editable = true, path = "."}
 "flake8" = "*"
 pyecharts = "*"
+altair = "*"
 
 [dev-packages]
 pylint = "*"
 twine = "*"
 "flake8" = "*"
 ipdb = "*"
+vega-datasets = "*"

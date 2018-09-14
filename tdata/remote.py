@@ -49,8 +49,8 @@ def download_stock_table():
     return stock_df[stock_df['symbol'].str.contains(r'SH|SZ')]
 
 
-def remote_sample_bar():
-    props = dict(symbol='000001.SH', trade_date=today)
+def remote_sample_bar(date=today):
+    props = dict(symbol='000001.SH', trade_date=date)
     bar, msg = ds.bar(**props)
     return bar.tail()
 
