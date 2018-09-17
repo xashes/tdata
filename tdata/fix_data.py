@@ -1,7 +1,7 @@
 from arctic import Arctic
 from tqdm import tqdm
 
-arctic = Arctic('pi3')
+arctic = Arctic('localhost')
 basedata = arctic['basedata']
 SYMBOLS = basedata.read('instruments').data['symbol']
 minute_lib = arctic['minute']

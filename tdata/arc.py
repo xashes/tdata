@@ -9,7 +9,7 @@ from remote_service import ds
 from datetime import datetime
 import jaqs.util as jutil
 
-arctic = Arctic('pi3')
+arctic = Arctic('localhost')
 basedata = arctic['basedata']
 SYMBOLS = basedata.read('instruments').data['symbol']
 
@@ -97,11 +97,6 @@ def init_minute_lib():
         lh.writelines(errors)
 
 
-def init_zen_lib():
-    arctic.delete_library('zen')
-    arctic.initialize_library('zen')
-
-
 def init_center_lib():
     arctic.delete_library('center')
     arctic.initialize_library('center')
@@ -182,24 +177,6 @@ def update_minute_lib():
                     'source': 'jaqs',
                     'last_date': int(last_date)
                 })
-
-
-def update_zen_lib():
-    import zen
-    symbols = tqdm(SYMBOLS)
-    zen_lib = arctic['zen']
-
-    for symbol in symbols:
-        try:
-            day_bar = local.daily(symbol).loc[:, [
-                'close', 'high', 'low', 'open', 'symbol', 'trade_status',
-                'turnover', 'volume'
-            ]]
-            brush = zen.hist_sum(day_bar)
-            zen_lib.write(
-                symbol, brush, metadata={'updated': datetime.today()})
-        except Exception as e:
-            print(f'{symbol}: {str(e)}')
 
 
 def update_center_lib():

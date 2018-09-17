@@ -16,11 +16,10 @@ import tdata.util as tutil
 from arctic import Arctic
 
 today = jutil.convert_datetime_to_int(datetime.today())
-arctic = Arctic('pi3')
+arctic = Arctic('localhost')
 BASEDATA_LIB = arctic['basedata']
 DAILY_LIB = arctic['daily']
 MINUTE_LIB = arctic['minute']
-ZEN_LIB = arctic['zen']
 SYMBOLS = BASEDATA_LIB.read('instruments').data.symbol.values
 
 
@@ -107,10 +106,6 @@ def bar(symbol: str = '000001.SH',
         except Exception as e:
             print(f'Error on {symbol} with frequency: {str(freq)}')
             print(f'Error message: {str(e)}')
-
-
-def brush(symbol: str = '000001.SH') -> pd.DataFrame:
-    return ZEN_LIB.read(symbol).data
 
 
 if __name__ == '__main__':
