@@ -9,6 +9,7 @@ import pandas as pd
 import talib
 import math
 import altair as alt
+import pyecharts as pe
 from imp import reload
 
 sns.set()
