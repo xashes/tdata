@@ -6,15 +6,11 @@ name = "pypi"
 [packages]
 jaqs = "*"
 fire = "*"
-pytest = "*"
-sqlalchemy = "*"
-"py2neo" = "*"
 pymongo = "*"
 tqdm = "*"
 arctic = {git = "https://github.com/manahl/arctic.git"}
 ta-lib = "*"
 tdata = {editable = true, path = "."}
-"flake8" = "*"
 pyecharts = "*"
 altair = "*"
 
@@ -24,3 +20,5 @@ twine = "*"
 "flake8" = "*"
 ipdb = "*"
 vega-datasets = "*"
+pytest = "*"
+ipykernel = "*"

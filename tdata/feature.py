@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import talib
+from tdata import local
 
 
 def add_columns(df):
@@ -13,7 +14,7 @@ def add_columns(df):
         pass
 
     # add log return and moving vol
-    df['return'] = np.log(df['close'] / df['close'].shift(1))
+    # df['return'] = np.log(df['close'] / df['close'].shift(1))
 
     # add macd related
     macd, macdsignal, macdhist = talib.MACD(df.close.values)
@@ -34,7 +35,7 @@ def add_columns(df):
 def sign_grp(se):
     grps = [0]
     for i in range(1, len(se)):
-        if se[i] == se[i - 1]:
+        if se.iloc[i] == se.iloc[i - 1]:
             grps.append(grps[i - 1])
         else:
             grps.append(grps[i - 1] + 1)
@@ -119,11 +120,12 @@ def center(df):
     return center
 
 
-def last_center(df, target=None):
+def last_center(sid, target=None):
     """
     input: df without columns added
            target -> number or None
     """
+    df = local.daily(sid)
     data = dict()
 
     if target:
@@ -137,7 +139,7 @@ def last_center(df, target=None):
     centers = df[df.top.notnull()]
     last_center = df.loc[df.macdgrps >= centers.iloc[-2].macdgrps]
 
-    data['symbol'] = last_center.symbol.values[0]
+    data['symbol'] = sid
     brushends = last_center.brushend.dropna().values
 
     # center
@@ -150,6 +152,8 @@ def last_center(df, target=None):
     data['brush_2'] = brushends[-2]
     data['brush_3'] = brushends[-3]
     data['brush_4'] = brushends[-4]
+    data['brush_min'] = min(brushends[:-1])
+    data['brush_max'] = max(brushends[:-1])
 
     # macd
     data['macd_mean'] = last_center.macd.mean()

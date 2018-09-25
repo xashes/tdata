@@ -12,7 +12,7 @@ def resample_bar(rule: str, bar: pd.DataFrame) -> pd.DataFrame:
             'high': resampled['high'].max(),
             'low': resampled['low'].min(),
             'open': resampled['open'].first(),
-            'symbol': bar['symbol'].iloc[0],
+            # 'symbol': bar['symbol'].iloc[0],
             'turnover': resampled['turnover'].sum(),
             'volume': resampled['volume'].sum()
         })
