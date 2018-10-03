@@ -1,7 +1,7 @@
 # util.py - some tool functions for data process
 
 import pandas as pd
-import jaqs.util as jutil
+# import jaqs.util as jutil
 
 
 def resample_bar(rule: str, bar: pd.DataFrame) -> pd.DataFrame:
@@ -21,11 +21,11 @@ def resample_bar(rule: str, bar: pd.DataFrame) -> pd.DataFrame:
         print('Resample Error: {str(e)}')
 
 
-def combine_date_time_column(bar,
-                             date_column: str = 'date',
-                             time_column: str = 'time') -> pd.DataFrame:
-    bar['datetime'] = jutil.combine_date_time(bar[date_column],
-                                              bar[time_column])
-    bar['datetime'] = pd.to_datetime(bar['datetime'], format='%Y%m%d%H%M%S')
-    bar = bar.drop(columns=[date_column, time_column])
-    return bar
+# def combine_date_time_column(bar,
+#                              date_column: str = 'date',
+#                              time_column: str = 'time') -> pd.DataFrame:
+#     bar['datetime'] = jutil.combine_date_time(bar[date_column],
+#                                               bar[time_column])
+#     bar['datetime'] = pd.to_datetime(bar['datetime'], format='%Y%m%d%H%M%S')
+#     bar = bar.drop(columns=[date_column, time_column])
+#     return bar
