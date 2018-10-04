@@ -5,7 +5,7 @@ from datetime import datetime
 class TestGetPrice():
     def test_freq_1d(self):
         df = get_price(
-            '000001.XSHE',
+            '000001.XSHG',
             start_date='2018-01-01',
             end_date='2018-08-31',
             frequency='1d')
@@ -18,7 +18,7 @@ class TestGetPrice():
 
     def test_freq_1m(self):
         df = get_price(
-            '000001.XSHE',
+            '000001.XSHG',
             start_date='2018-08-20',
             end_date=datetime(2018, 8, 31, 15),
             frequency='1m')
@@ -31,7 +31,7 @@ class TestGetPrice():
 
     def test_freq_5m(self):
         df = get_price(
-            '000001.XSHE',
+            '000001.XSHG',
             start_date='2018-08-20',
             end_date=datetime(2018, 8, 31, 15),
             frequency='5m')
@@ -44,7 +44,7 @@ class TestGetPrice():
 
     def test_freq_15m(self):
         df = get_price(
-            '000001.XSHE',
+            '000001.XSHG',
             start_date='2018-08-20',
             end_date=datetime(2018, 8, 31, 15),
             frequency='15m')
@@ -57,7 +57,7 @@ class TestGetPrice():
 
     def test_freq_30m(self):
         df = get_price(
-            '000001.XSHE',
+            '000001.XSHG',
             start_date='2018-08-20',
             end_date=datetime(2018, 8, 31, 15),
             frequency='30m')

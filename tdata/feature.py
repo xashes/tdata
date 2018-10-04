@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import talib
 from tdata import local
