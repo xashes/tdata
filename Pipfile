@@ -13,6 +13,7 @@ ta-lib = "*"
 tdata = {editable = true, path = "."}
 pyecharts = "*"
 altair = "*"
+selenium = "*"
 
 [dev-packages]
 pylint = "*"
