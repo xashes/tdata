@@ -1,6 +1,5 @@
 from pyecharts import Kline, Bar, Line
 from pyecharts import Grid, Overlap
-from tdata import feature
 
 
 def brush(data):
@@ -22,7 +21,6 @@ def brush(data):
         tooltip_axispointer_type='cross',
         is_more_utils=True,
     )
-
 
     brush = Line()
     brush.add(
@@ -61,7 +59,12 @@ def brush(data):
 
     macd = Line()
     macd.add('macd', data.index, data.macd, symbol=None, line_color='orange')
-    macd.add('macd signal', data.index, data.macdsignal, symbol=None, line_color='cyan')
+    macd.add(
+        'macd signal',
+        data.index,
+        data.macdsignal,
+        symbol=None,
+        line_color='cyan')
 
     middle = Overlap()
     middle.add(macdhist)
@@ -81,3 +84,9 @@ def brush(data):
     grid.add(turnover, grid_top='88%')
 
     return grid
+
+
+if __name__ == '__main__':
+    from tdata.features import Features
+    df = Features().data()
+    brush(df).render('chart.html')

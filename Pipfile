@@ -4,22 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-jaqs = "*"
-fire = "*"
-pymongo = "*"
-tqdm = "*"
 arctic = {git = "https://github.com/manahl/arctic.git"}
 ta-lib = "*"
 tdata = {editable = true, path = "."}
-pyecharts = "*"
 altair = "*"
-selenium = "*"
 
 [dev-packages]
-pylint = "*"
-twine = "*"
+autoflake = "*"
 "flake8" = "*"
-ipdb = "*"
-vega-datasets = "*"
 pytest = "*"
 ipykernel = "*"
