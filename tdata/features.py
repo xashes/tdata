@@ -37,7 +37,7 @@ class Features:
         df['macdgrps'] = self.sign_grp(df.macd > 0)
         df['macdhistgrps'] = self.sign_grp(df.macdhist > 0)
 
-        # add brush data
+        # add brush and center data
         df = df.merge(
             self.brush(df), how='outer', left_index=True, right_index=True)
         df = df.merge(

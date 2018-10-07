@@ -2,10 +2,11 @@
 # provide API to get data for instruments
 # requirements: arctic and pandas
 
-import pandas as pd
+from datetime import datetime
+
 from arctic import Arctic
 from arctic.date import DateRange
-from datetime import datetime
+
 import tdata.util as tutil
 
 arctic = Arctic('localhost')
@@ -14,7 +15,7 @@ day_lib = arctic['day']
 minute_lib = arctic['minute1']
 
 
-def get_price(sid: str = '000001.XSHG',
+def get_price(sid='000001.XSHG',
               start_date='2018-01-01',
               end_date=datetime.today(),
               frequency='1d'):

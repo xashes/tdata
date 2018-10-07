@@ -88,5 +88,5 @@ def brush(data):
 
 if __name__ == '__main__':
     from tdata.features import Features
-    df = Features().data()
+    df = Features(start_date='2014-01-01').data()
     brush(df).render('chart.html')

@@ -12,7 +12,7 @@ class TestGetPrice():
 
         assert df.index[0] == datetime(2018, 1, 2)
         assert df.index[-1] == datetime(2018, 8, 31)
-        assert df.shape == (164, 8)
+        assert df.shape == (164, 6)
 
         return
 
