@@ -24,7 +24,7 @@ def test_data(features):
 
     assert df.index[0] == datetime(2014, 2, 25)
     assert df.index[-1] == datetime(2018, 8, 1)
-    assert df.shape == (1086, 14)
+    assert df.shape == (1086, 17)
 
     assert 'brushend' in df.columns
     assert 'bottom' in df.columns
@@ -45,3 +45,6 @@ def test_data(features):
 
     assert tops.shape == (4,)
     assert tops.loc['2018-07-06'] == 3140.4408
+
+    assert round(df.loc['2018-08-01', 'EMA120']) == 3049
+    assert round(df.loc['2018-08-01', 'EMA250']) == 3139 + 2

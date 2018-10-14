@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 import talib
 
@@ -28,6 +29,10 @@ class Features:
     def data(self):
 
         df = self.bar().copy()
+
+        # add log return
+        df['return'] = np.log(df['close'] / df['close'].shift(1))
+
         # add macd related
         macd, macdsignal, macdhist = talib.MACD(df.close.values)
         df['macd'] = macd
@@ -42,6 +47,10 @@ class Features:
             self.brush(df), how='outer', left_index=True, right_index=True)
         df = df.merge(
             self.center(df), how='outer', left_index=True, right_index=True)
+
+        # add EMA
+        df['EMA120'] = talib.EMA(df.close.values, timeperiod=120)
+        df['EMA250'] = talib.EMA(df.close.values, timeperiod=250)
 
         return df
 
