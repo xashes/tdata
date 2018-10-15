@@ -48,7 +48,8 @@ class Features:
         df = df.merge(
             self.center(df), how='outer', left_index=True, right_index=True)
 
-        # add EMA
+        # should after adding brush and center, or before adding macd
+        # for dropna reason
         df['EMA120'] = talib.EMA(df.close.values, timeperiod=120)
         df['EMA250'] = talib.EMA(df.close.values, timeperiod=250)
 

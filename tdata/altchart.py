@@ -62,4 +62,4 @@ def chart(sid='000001.XSHG',
 
 
 if __name__ == '__main__':
-    chart(start_date='2000-01-01').save('chart.html')
+    chart(start_date='2014-01-01', end_date='2018-08-01').save('chart.html')
